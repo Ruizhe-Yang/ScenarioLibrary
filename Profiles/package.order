@@ -1,0 +1,11 @@
+PeriodicLoadCycle
+PeriodicProfile
+PiecewiseConstant
+PiecewiseLinear
+Pulse
+Ramp
+RepeatingStartupCycle
+ScheduledLoadEnvelope
+Sine
+StartupHoldShutdown
+Step
