@@ -1,17 +1,17 @@
 within ScenarioLibrary.Profiles;
-block ScheduledLoadEnvelope "正常试验扫频负载及平滑包络"
-  parameter Modelica.Units.SI.Time startTime = 1;
-  parameter Modelica.Units.SI.Time duration(min=Modelica.Constants.small) = 5;
-  parameter Modelica.Units.SI.Time edgeTime(min=Modelica.Constants.small) = 0.5;
-  parameter Modelica.Units.SI.Frequency lowFrequency(min=0) = 1;
-  parameter Modelica.Units.SI.Frequency highFrequency(min=0) = 5;
-  parameter Real meanLoad = 0;
-  parameter Real amplitude(min=0) = 1;
-  Modelica.Blocks.Interfaces.RealOutput load "Plan value in the user-specified unit" annotation(Placement(transformation(extent={{94,-6},{106,6}}), iconTransformation(extent={{94,-6},{106,6}})));
+block ScheduledLoadEnvelope "Linear frequency sweep with a finite amplitude envelope"
+  parameter Modelica.Units.SI.Time startTime = 1 "Absolute start of the frequency sweep";
+  parameter Modelica.Units.SI.Time duration(min=Modelica.Constants.small) = 5 "Positive sweep duration";
+  parameter Modelica.Units.SI.Time edgeTime(min=Modelica.Constants.small) = 0.5 "Duration of each linear amplitude transition";
+  parameter Modelica.Units.SI.Frequency lowFrequency(min=0) = 1 "Initial sweep frequency";
+  parameter Modelica.Units.SI.Frequency highFrequency(min=0) = 5 "Final sweep frequency";
+  parameter Real meanLoad = 0 "Mean demand and output outside the sweep";
+  parameter Real amplitude(min=0) = 1 "Maximum oscillating contribution";
+  Modelica.Blocks.Interfaces.RealOutput load "Prescribed load in the chosen signal unit" annotation(Placement(transformation(extent={{94,-6},{106,6}}), iconTransformation(extent={{94,-6},{106,6}})));
 protected
-  Modelica.Units.SI.Time t;
-  Real edge;
-  Real phase;
+  Modelica.Units.SI.Time t "Elapsed sweep time clamped to the sweep interval";
+  Real edge "Normalised piecewise-linear amplitude envelope";
+  Real phase "Integrated phase of the linear frequency sweep";
 initial equation
   assert(duration>0 and edgeTime>0 and 2*edgeTime<=duration and highFrequency>=lowFrequency and lowFrequency>=0 and amplitude>=0,
     "Invalid load sweep.");
@@ -31,25 +31,5 @@ equation
         Text(extent={{-150,155},{150,125}}, textString="%name", textColor={0,0,255}, fontSize=0)
       }),
     Diagram(coordinateSystem(extent={{-100,-100},{100,100}})),
-    Documentation(info="<html><p><b>Purpose</b> 正常试验扫频负载及平滑包络</p><p><b>Interfaces</b> Modelica.Blocks.Interfaces.RealOutput load \"Plan value in the user-specified unit\"</p><p><b>Parameters</b> parameter Modelica.Units.SI.Time startTime = 1; parameter Modelica.Units.SI.Time duration(min=Modelica.Constants.small) = 5; parameter Modelica.Units.SI.Time edgeTime(min=Modelica.Constants.small) = 0.5; parameter Modelica.Units.SI.Frequency lowFrequency(min=0) = 1; parameter Modelica.Units.SI.Frequency highFrequency(min=0) = 5; parameter Real meanLoad = 0; parameter Real amplitude(min=0) = 1</p><p><b>Behavior</b> 正常试验扫频负载及平滑包络</p><p><b>Initialization</b> Use the declared initial values and host state modifiers.</p><p><b>Activation and recovery</b> Not applicable.</p><p><b>Limitations</b> Use the declared parameter range. The catalog identifies simulation coverage.</p><p><b>Observables</b> Inspect the declared output variables.</p><p><b>Example</b> <a href=\"modelica://ScenarioLibrary.Examples.MultiphaseMission\">ScenarioLibrary.Examples.MultiphaseMission</a></p>
-<p>正常试验扫频负载及平滑包络</p>
-<p><b>行为</b> 正常激励从低频扫描至高频，启停包络将附加负载连续收零。</p>
-<p><b>最小用法</b> 接台架计划载荷或试验环境边界的信号端。</p>
-<p><b>适用边界</b> 最高频率与边沿须可由仿真设置解析。该模型表示预定试验。</p>
-<p>参数的类型、默认值和取值见下列声明。</p>
-<ul>
-<li><code>Modelica.Units.SI.Time startTime = 1</code></li>
-<li><code>Modelica.Units.SI.Time duration(min=Modelica.Constants.small) = 5</code></li>
-<li><code>Modelica.Units.SI.Time edgeTime(min=Modelica.Constants.small) = 0.5</code></li>
-<li><code>Modelica.Units.SI.Frequency lowFrequency(min=0) = 1</code></li>
-<li><code>Modelica.Units.SI.Frequency highFrequency(min=0) = 5</code></li>
-<li><code>Real meanLoad = 0</code></li>
-<li><code>Real amplitude(min=0) = 1</code></li>
-</ul>
-<p>接口及方向</p>
-<ul>
-<li><code>Modelica.Blocks.Interfaces.RealOutput load \"Plan value in the user-specified unit\"</code></li>
-</ul>
-<p><a href=\"modelica://ScenarioLibrary.Examples.MultiphaseMission\">MechanicalMissionScenario</a> 提供同域宿主参考。</p>
-</html>"));
+    Documentation(info="<html><p>Add a sinusoidal sweep to <code>meanLoad</code> over the absolute interval from <code>startTime</code> to <code>startTime+duration</code>. The phase integrates a frequency varying linearly from <code>lowFrequency</code> to <code>highFrequency</code>.</p><p>A linear amplitude envelope rises over <code>edgeTime</code> and falls over the same duration. Require <code>2*edgeTime&lt;=duration</code>, nonnegative frequencies and amplitude, and an ordered frequency range. Outside the interval the output is <code>meanLoad</code>.</p></html>"));
 end ScheduledLoadEnvelope;

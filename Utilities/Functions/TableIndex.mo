@@ -1,9 +1,9 @@
 within ScenarioLibrary.Utilities.Functions;
-function TableIndex "Right-continuous index for a strictly ordered time table"
+function TableIndex "Right-continuous index in an ordered coordinate table"
   extends Modelica.Icons.Function;
-input Real t;
-  input Real times[:];
-  output Integer i;
+input Real t "Coordinate to locate in the table";
+  input Real times[:] "Ordered coordinates";
+  output Integer i "Last qualifying array index, or zero";
 algorithm
   i := 0;
   for k in 1:size(times,1) loop
@@ -23,5 +23,5 @@ algorithm
         Line(points={{0,39.58},{0,13.68}}, color={64,64,64}, thickness=0.9, pattern=LinePattern.Solid, arrow={Arrow.None,Arrow.Filled}),
         Text(extent={{-150,155},{150,125}}, textString="%name", textColor={0,0,255}, fontSize=0)
       }),
-    Documentation(info="<html><p><b>Purpose</b> Right-continuous index for a strictly ordered time table.</p><p><b>Interfaces</b> input Real t; input Real times[:]; output Integer i</p><p><b>Parameters</b> No tuning parameters; use the declared input contract.</p><p><b>Behavior</b> Right-continuous index for a strictly ordered time table</p><p><b>Initialization</b> Evaluated from the current inputs and parameter bindings.</p><p><b>Activation and recovery</b> Not applicable.</p><p><b>Limitations</b> The caller validates strictly increasing times. The return value is zero before the first point.</p><p><b>Observables</b> i</p></html>"));
+    Documentation(info="<html><p>Return the last array index whose coordinate is less than or equal to <code>t</code>, or zero if no entry qualifies. With strictly increasing <code>times</code>, an exact table coordinate selects that entry and the final index is retained beyond the table.</p><p>An empty table returns zero. The function does not validate ordering; callers that require time-table semantics must supply an ordered table.</p></html>"));
 end TableIndex;

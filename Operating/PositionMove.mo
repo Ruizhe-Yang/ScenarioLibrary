@@ -1,15 +1,15 @@
 within ScenarioLibrary.Operating;
-block PositionMove "生成速度和加速度两端均平滑的位置移动指令"
-  parameter Modelica.Units.SI.Position initialPosition = 0 "起始位置，m";
-  parameter Modelica.Units.SI.Position targetPosition = 1 "目标位置，m";
-  parameter Modelica.Units.SI.Time startTime = 1 "运动起点，s";
-  parameter Modelica.Units.SI.Time duration(min=Modelica.Constants.small) = 2 "运动持续时间，s";
-  Modelica.Blocks.Interfaces.RealOutput position(unit="m") "任务位置" annotation(Placement(transformation(extent={{94,42},{106,54}}), iconTransformation(extent={{94,42},{106,54}})));
-  Modelica.Blocks.Interfaces.RealOutput velocity(unit="m/s") "位置轨迹的解析导数" annotation(Placement(transformation(extent={{94,-6},{106,6}}), iconTransformation(extent={{94,-6},{106,6}})));
-  Modelica.Blocks.Interfaces.BooleanOutput arrived "计划轨迹达到终点" annotation(Placement(transformation(extent={{94,-54},{106,-42}}), iconTransformation(extent={{94,-54},{106,-42}})));
+block PositionMove "Quintic position command with zero endpoint velocity and acceleration"
+  parameter Modelica.Units.SI.Position initialPosition = 0 "Position before the scheduled move";
+  parameter Modelica.Units.SI.Position targetPosition = 1 "Position after the scheduled move";
+  parameter Modelica.Units.SI.Time startTime = 1 "Absolute start of the position move";
+  parameter Modelica.Units.SI.Time duration(min=Modelica.Constants.small) = 2 "Positive duration of the quintic move";
+  Modelica.Blocks.Interfaces.RealOutput position(unit="m") "Prescribed position trajectory" annotation(Placement(transformation(extent={{94,42},{106,54}}), iconTransformation(extent={{94,42},{106,54}})));
+  Modelica.Blocks.Interfaces.RealOutput velocity(unit="m/s") "Analytical velocity of the position trajectory" annotation(Placement(transformation(extent={{94,-6},{106,6}}), iconTransformation(extent={{94,-6},{106,6}})));
+  Modelica.Blocks.Interfaces.BooleanOutput arrived "The scheduled move has reached its final time" annotation(Placement(transformation(extent={{94,-54},{106,-42}}), iconTransformation(extent={{94,-54},{106,-42}})));
 protected
-  Real x(min=0,max=1);
-  Modelica.Units.SI.Length travel;
+  Real x(min=0,max=1) "Normalised progress clamped to the move interval";
+  Modelica.Units.SI.Length travel "Signed displacement between the endpoint positions";
 initial equation
   assert(duration > 0, "Move duration must be positive.");
 equation
@@ -28,24 +28,5 @@ equation
         Text(extent={{-150,155},{150,125}}, textString="%name", textColor={0,0,255}, fontSize=0)
       }),
     Diagram(coordinateSystem(extent={{-100,-100},{100,100}}, preserveAspectRatio=true), graphics={Text(extent={{-96,99},{96,88}}, textColor={30,104,76}, textString="PositionMove")}),
-    Documentation(info="<html><p><b>Purpose</b> 生成速度和加速度两端均平滑的位置移动指令</p><p><b>Interfaces</b> Modelica.Blocks.Interfaces.RealOutput position(unit=\"m\") \"任务位置\"; Modelica.Blocks.Interfaces.RealOutput velocity(unit=\"m/s\") \"位置轨迹的解析导数\"; Modelica.Blocks.Interfaces.BooleanOutput arrived \"计划轨迹达到终点\"</p><p><b>Parameters</b> parameter Modelica.Units.SI.Position initialPosition = 0 \"起始位置，m\"; parameter Modelica.Units.SI.Position targetPosition = 1 \"目标位置，m\"; parameter Modelica.Units.SI.Time startTime = 1 \"运动起点，s\"; parameter Modelica.Units.SI.Time duration(min=Modelica.Constants.small) = 2 \"运动持续时间，s\"</p><p><b>Behavior</b> 生成速度和加速度两端均平滑的位置移动指令</p><p><b>Initialization</b> Use the declared initial values and host state modifiers.</p><p><b>Activation and recovery</b> Not applicable.</p><p><b>Limitations</b> Use the declared parameter range. The catalog identifies simulation coverage.</p><p><b>Observables</b> Inspect the declared output variables.</p><p><b>Example</b> <a href=\"modelica://ScenarioLibrary.Examples.LoadAndCommandSchedules\">ScenarioLibrary.Examples.LoadAndCommandSchedules</a></p>
-<p>生成速度和加速度两端均平滑的位置移动指令</p>
-<p>专业分类为 ExternalInputs.Position。</p>
-<p>接口与方向</p>
-<ul>
-<li><code>Modelica.Blocks.Interfaces.RealOutput position(unit=\"m\") \"任务位置\"</code></li>
-<li><code>Modelica.Blocks.Interfaces.RealOutput velocity(unit=\"m/s\") \"位置轨迹的解析导数\"</code></li>
-<li><code>Modelica.Blocks.Interfaces.BooleanOutput arrived \"计划轨迹达到终点\"</code></li>
-</ul>
-<p>参数、类型、默认值及约束</p>
-<ul>
-<li><code>Modelica.Units.SI.Position initialPosition = 0 \"起始位置，m\"</code></li>
-<li><code>Modelica.Units.SI.Position targetPosition = 1 \"目标位置，m\"</code></li>
-<li><code>Modelica.Units.SI.Time startTime = 1 \"运动起点，s\"</code></li>
-<li><code>Modelica.Units.SI.Time duration(min=Modelica.Constants.small) = 2 \"运动持续时间，s\"</code></li>
-</ul>
-<p><b>时序与基准行为</b> 五次曲线从静止参考进入移动并在终点平滑保持。支持反向移动。</p>
-<p><b>最小用法</b> 将 position、velocity 分别接位置与速度前馈。真实到达可由实际位置反馈观测。 <a href=\"modelica://ScenarioLibrary.Examples.MultiphaseMission\">MechanicalMissionScenario</a> 展示同域接线。</p>
-<p><b>适用边界</b> 时长和位移决定峰速度。由系统任务确定可用行程和执行能力。</p>
-</html>"));
+    Documentation(info="<html><p>Interpolate from <code>initialPosition</code> to <code>targetPosition</code> using a quintic polynomial over the positive <code>duration</code>. The position is held outside the move; the analytical <code>velocity</code> and acceleration vanish at both endpoints.</p><p><code>arrived</code> becomes true when the scheduled move ends. It reports the planned trajectory boundary and does not measure the position of a connected plant.</p></html>"));
 end PositionMove;

@@ -1,15 +1,15 @@
 within ScenarioLibrary.Profiles;
-block StartupHoldShutdown "按启动、运行、停机三段给出任务需求"
-  parameter Modelica.Units.SI.Time startTime = 1 "启动时刻，s";
-  parameter Modelica.Units.SI.Time riseTime(min=Modelica.Constants.small) = 2 "启动爬升时间，s";
-  parameter Modelica.Units.SI.Time holdTime(min=0) = 5 "稳定运行时间，s";
-  parameter Modelica.Units.SI.Time fallTime(min=Modelica.Constants.small) = 2 "停机回落时间，s";
-  parameter Real standby = 0 "待机值";
-  parameter Real rated = 1 "运行值";
-  Modelica.Blocks.Interfaces.RealOutput y "任务输出" annotation(Placement(transformation(extent={{94,-6},{106,6}}), iconTransformation(extent={{94,-6},{106,6}})));
+block StartupHoldShutdown "Linear start-up, hold and shutdown demand"
+  parameter Modelica.Units.SI.Time startTime = 1 "Absolute start of the demand sequence";
+  parameter Modelica.Units.SI.Time riseTime(min=Modelica.Constants.small) = 2 "Positive duration of the linear rise";
+  parameter Modelica.Units.SI.Time holdTime(min=0) = 5 "Duration of the constant rated demand";
+  parameter Modelica.Units.SI.Time fallTime(min=Modelica.Constants.small) = 2 "Positive duration of the linear fall";
+  parameter Real standby = 0 "Demand outside the running portion";
+  parameter Real rated = 1 "Demand during the hold portion";
+  Modelica.Blocks.Interfaces.RealOutput y "Prescribed output signal" annotation(Placement(transformation(extent={{94,-6},{106,6}}), iconTransformation(extent={{94,-6},{106,6}})));
 protected
-  Real fraction;
-  Modelica.Units.SI.Time elapsed;
+  Real fraction "Normalised demand relative to standby and rated values";
+  Modelica.Units.SI.Time elapsed "Elapsed time since the sequence start";
 initial equation
   assert(riseTime > 0 and holdTime >= 0 and fallTime > 0, "Invalid startup or shutdown durations.");
 equation
@@ -28,24 +28,5 @@ equation
         Text(extent={{-150,155},{150,125}}, textString="%name", textColor={0,0,255}, fontSize=0)
       }),
     Diagram(coordinateSystem(extent={{-100,-100},{100,100}}, preserveAspectRatio=true), graphics={Text(extent={{-96,99},{96,88}}, textColor={30,104,76}, textString="StartupHoldShutdown")}),
-    Documentation(info="<html><p><b>Purpose</b> 按启动、运行、停机三段给出任务需求</p><p><b>Interfaces</b> Modelica.Blocks.Interfaces.RealOutput y \"任务输出\"</p><p><b>Parameters</b> parameter Modelica.Units.SI.Time startTime = 1 \"启动时刻，s\"; parameter Modelica.Units.SI.Time riseTime(min=Modelica.Constants.small) = 2 \"启动爬升时间，s\"; parameter Modelica.Units.SI.Time holdTime(min=0) = 5 \"稳定运行时间，s\"; parameter Modelica.Units.SI.Time fallTime(min=Modelica.Constants.small) = 2 \"停机回落时间，s\"; parameter Real standby = 0 \"待机值\"; parameter Real rated = 1 \"运行值\"</p><p><b>Behavior</b> 按启动、运行、停机三段给出任务需求</p><p><b>Initialization</b> Use the declared initial values and host state modifiers.</p><p><b>Activation and recovery</b> Not applicable.</p><p><b>Limitations</b> Use the declared parameter range. The catalog identifies simulation coverage.</p><p><b>Observables</b> Inspect the declared output variables.</p><p><b>Example</b> <a href=\"modelica://ScenarioLibrary.Examples.MultiphaseMission\">ScenarioLibrary.Examples.MultiphaseMission</a></p>
-<p>按启动、运行、停机三段给出任务需求</p>
-<p>专业分类为 MissionProfiles.MultiPhase。</p>
-<p>接口与方向</p>
-<ul>
-<li><code>Modelica.Blocks.Interfaces.RealOutput y \"任务输出\"</code></li>
-</ul>
-<p>参数、类型、默认值及约束</p>
-<ul>
-<li><code>Modelica.Units.SI.Time startTime = 1 \"启动时刻，s\"</code></li>
-<li><code>Modelica.Units.SI.Time riseTime(min=Modelica.Constants.small) = 2 \"启动爬升时间，s\"</code></li>
-<li><code>Modelica.Units.SI.Time holdTime(min=0) = 5 \"稳定运行时间，s\"</code></li>
-<li><code>Modelica.Units.SI.Time fallTime(min=Modelica.Constants.small) = 2 \"停机回落时间，s\"</code></li>
-<li><code>Real standby = 0 \"待机值\"</code></li>
-<li><code>Real rated = 1 \"运行值\"</code></li>
-</ul>
-<p><b>时序与基准行为</b> 启动和停机线性，含独立稳态段。两侧为 standby，输出值连续。</p>
-<p><b>最小用法</b> 接正常供热、流量需求或加载比例。 <a href=\"modelica://ScenarioLibrary.Examples.MultiphaseMission\">ThermalCycleScenario</a> 展示同域接线。</p>
-<p><b>适用边界</b> 短时间常数可能使宿主瞬态刚性增加。</p>
-</html>"));
+    Documentation(info="<html><p>Move from <code>standby</code> to <code>rated</code> over <code>riseTime</code>, hold for <code>holdTime</code>, then return over <code>fallTime</code>. The sequence starts at the absolute <code>startTime</code>; standby applies before it and after shutdown.</p><p>Rise and fall durations must be positive; the hold may be zero. The output is a prescribed demand signal and does not measure plant start-up or shutdown completion.</p></html>"));
 end StartupHoldShutdown;

@@ -1,9 +1,9 @@
 within ScenarioLibrary.Environment;
-block Temperature "Planned temperature profile"
-parameter Integer n(min=1)=2;
-  parameter Modelica.Units.SI.Time times[n]=linspace(0,1,n);
-  parameter Modelica.Units.SI.Temperature values[n]=fill(300,n);
-  Modelica.Blocks.Interfaces.RealOutput y(unit="K") annotation(Placement(transformation(origin={100,0},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,0},extent={{-10,-10},{10,10}})));
+block Temperature "Piecewise linear absolute-temperature schedule"
+parameter Integer n(min=1)=2 "Number of temperature schedule points";
+  parameter Modelica.Units.SI.Time times[n]=linspace(0,1,n) "Strictly increasing simulation times";
+  parameter Modelica.Units.SI.Temperature values[n]=fill(300,n) "Positive absolute-temperature values at the scheduled times";
+  Modelica.Blocks.Interfaces.RealOutput y(unit="K")  "Scheduled absolute temperature" annotation(Placement(transformation(origin={100,0},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,0},extent={{-10,-10},{10,10}})));
 protected
   ScenarioLibrary.Profiles.PiecewiseLinear profile(n=n,times=times,values=values);
 initial equation
@@ -22,5 +22,5 @@ equation
         Line(points={{-18,-28},{5,16},{24,16},{43,42},{64,13}}, color={191,0,0}, thickness=1.2, pattern=LinePattern.Solid),
         Text(extent={{-150,155},{150,125}}, textString="%name", textColor={0,0,255}, fontSize=0)
       }),
-    Documentation(info="<html><p><b>Purpose</b> Planned temperature profile.</p><p><b>Interfaces</b> Modelica.Blocks.Interfaces.RealOutput y(unit=\"K\")</p><p><b>Parameters</b> parameter Integer n(min=1)=2; parameter Modelica.Units.SI.Time times[n]=linspace(0,1,n); parameter Modelica.Units.SI.Temperature values[n]=fill(300,n)</p><p><b>Behavior</b> Planned temperature profile</p><p><b>Initialization</b> The declared start values and initialization equations apply.</p><p><b>Activation and recovery</b> Not applicable.</p><p><b>Limitations</b> Outputs retain the units declared at the interface. Numerical values depend on the supplied input and parameter range.</p><p><b>Observables</b> y</p><p><b>Example</b> <a href=\"modelica://ScenarioLibrary.Examples.EnvironmentalConditions\">ScenarioLibrary.Examples.EnvironmentalConditions</a></p></html>"));
+    Documentation(info="<html><p>Interpolate the positive absolute-temperature values at the specified simulation times. Values before the first point and after the last point are held at the corresponding endpoints; a one-point table gives a constant output.</p><p>Use strictly increasing times and connect <code>y</code> in kelvin to the intended signal input or prescribed-temperature boundary.</p></html>"));
 end Temperature;

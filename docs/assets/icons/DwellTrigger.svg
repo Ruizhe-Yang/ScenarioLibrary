@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="-115 -115 230 230" role="img" aria-labelledby="title"><title id="title">DwellTrigger: original Modelica icon</title><rect x="-90" y="-85" width="180" height="170" rx="0" fill="rgb(255,255,255)" stroke="rgb(64,64,64)" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="-64,26 -43,26 -43,-24 61,-24" fill="none" stroke="rgb(128,0,128)" stroke-width="3.08" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="-43,-49 14,-49" fill="none" stroke="rgb(64,64,64)" stroke-width="2.24" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="-43,-49 -35,-52 -35,-46" fill="rgb(64,64,64)" stroke="rgb(64,64,64)"/>
+<polygon points="14,-49 6,-46 6,-52" fill="rgb(64,64,64)" stroke="rgb(64,64,64)"/>
+<polyline points="14,52 14,7 31,7 31,52 62,52" fill="none" stroke="rgb(128,0,128)" stroke-width="3.08" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="-9.5" y="-63" font-family="Arial,DejaVu Sans,sans-serif" font-size="15.6" text-anchor="middle" dominant-baseline="central" fill="rgb(64,64,64)">dt</text></svg>

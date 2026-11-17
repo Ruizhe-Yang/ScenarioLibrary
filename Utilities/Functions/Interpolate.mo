@@ -1,12 +1,12 @@
 within ScenarioLibrary.Utilities.Functions;
 function Interpolate "Linear interpolation with endpoint holds"
   extends Modelica.Icons.Function;
-input Real t;
-  input Real times[:];
-  input Real values[size(times,1)];
-  output Real y;
+input Real t "Coordinate at which to evaluate the profile";
+  input Real times[:] "Strictly increasing coordinates";
+  input Real values[size(times,1)] "Values corresponding to the coordinates";
+  output Real y "Interpolated value with endpoint holds";
 protected
-  Integer i;
+  Integer i "Index of the latest reached coordinate";
 algorithm
   assert(size(times,1)>0,"Empty profile.");
   i := TableIndex(t,times);
@@ -29,5 +29,5 @@ algorithm
         Ellipse(extent={{35.52,13.68},{39.96,18.12}}, lineColor={0,0,127}, fillColor={0,0,127}, fillPattern=FillPattern.Solid, pattern=LinePattern.Solid, lineThickness=0.5),
         Text(extent={{-150,155},{150,125}}, textString="%name", textColor={0,0,255}, fontSize=0)
       }),
-    Documentation(info="<html><p><b>Purpose</b> Linear interpolation with endpoint holds.</p><p><b>Interfaces</b> input Real t; input Real times[:]; input Real values[size(times,1)]; output Real y</p><p><b>Parameters</b> No tuning parameters; use the declared input contract.</p><p><b>Behavior</b> Linear interpolation with endpoint holds</p><p><b>Initialization</b> Evaluated from the current inputs and parameter bindings.</p><p><b>Activation and recovery</b> Not applicable.</p><p><b>Limitations</b> Repeated nodes are rejected by the owning table block.</p><p><b>Observables</b> y</p></html>"));
+    Documentation(info="<html><p>Interpolate <code>values</code> at the coordinate <code>t</code> using the corresponding <code>times</code>. Hold the first value before the first coordinate and the last value at and after the final coordinate. A one-entry table gives a constant value.</p><p>The table must be nonempty and the caller must supply strictly increasing coordinates. The function checks only that at least one entry exists; it does not validate ordering.</p></html>"));
 end Interpolate;

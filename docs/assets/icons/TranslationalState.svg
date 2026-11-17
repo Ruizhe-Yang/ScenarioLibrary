@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="-115 -115 230 230" role="img" aria-labelledby="title"><title id="title">TranslationalState: original Modelica icon</title><rect x="-100" y="-100" width="200" height="200" rx="0" fill="rgb(255,215,136)" stroke="rgb(108,88,49)" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="-100,-48 100,-48" fill="none" stroke="rgb(108,88,49)" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="-57.2,31.4 57.2,31.4" fill="none" stroke="rgb(128,128,128)" stroke-width="2.24" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="-29.92" y="-14.36" width="59.84" height="39.6" rx="0" fill="rgb(235,235,235)" stroke="rgb(64,64,64)" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="-17.6,-34.6 50.16,-34.6" fill="none" stroke="rgb(64,64,64)" stroke-width="2.24" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="50.16,-34.6 42.16,-31.6 42.16,-37.6" fill="rgb(64,64,64)" stroke="rgb(64,64,64)"/>
+<text x="0" y="-66" font-family="Arial,DejaVu Sans,sans-serif" font-size="21.84" text-anchor="middle" dominant-baseline="central" fill="rgb(108,88,49)">s0, v0</text></svg>

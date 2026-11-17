@@ -1,5 +1,5 @@
 within ScenarioLibrary;
-package Profiles "Profiles"
+package Profiles "Scalar profiles and finite operating cycles"
   extends Modelica.Icons.Package;
   annotation(Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
       graphics={
@@ -11,4 +11,5 @@ package Profiles "Profiles"
         Ellipse(extent={{22.08,32.2},{27.6,37.72}}, lineColor={0,0,127}, fillColor={0,0,127}, fillPattern=FillPattern.Solid, pattern=LinePattern.Solid, lineThickness=0.5),
         Ellipse(extent={{56.12,10.12},{61.64,15.64}}, lineColor={0,0,127}, fillColor={0,0,127}, fillPattern=FillPattern.Solid, pattern=LinePattern.Solid, lineThickness=0.5)
       }));
+  annotation(Documentation(info="<html><p>Deterministic scalar profiles include steps, ramps, tables, sinusoids and finite repeated cycles. Basic profiles offer an optional enable input that restarts their local time base; the remaining schedules use absolute simulation time.</p></html>"));
 end Profiles;

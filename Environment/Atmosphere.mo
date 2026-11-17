@@ -1,9 +1,9 @@
 within ScenarioLibrary.Environment;
-block Atmosphere "Dry-air troposphere pressure, temperature and density"
-Modelica.Blocks.Interfaces.RealInput height(unit="m") annotation(Placement(transformation(origin={-100,0},extent={{-10,-10},{10,10}}),iconTransformation(origin={-100,0},extent={{-10,-10},{10,10}})));
-  Modelica.Blocks.Interfaces.RealOutput T(unit="K") annotation(Placement(transformation(origin={100,70},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,70},extent={{-10,-10},{10,10}})));
-  Modelica.Blocks.Interfaces.RealOutput p(unit="Pa") annotation(Placement(transformation(origin={100,0},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,0},extent={{-10,-10},{10,10}})));
-  Modelica.Blocks.Interfaces.RealOutput rho(unit="kg/m3") annotation(Placement(transformation(origin={100,-70},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,-70},extent={{-10,-10},{10,10}})));
+block Atmosphere "Dry-air troposphere temperature, pressure and density"
+Modelica.Blocks.Interfaces.RealInput height(unit="m")  "Height above the atmospheric reference level" annotation(Placement(transformation(origin={-100,0},extent={{-10,-10},{10,10}}),iconTransformation(origin={-100,0},extent={{-10,-10},{10,10}})));
+  Modelica.Blocks.Interfaces.RealOutput T(unit="K")  "Calculated absolute air temperature" annotation(Placement(transformation(origin={100,70},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,70},extent={{-10,-10},{10,10}})));
+  Modelica.Blocks.Interfaces.RealOutput p(unit="Pa")  "Calculated absolute air pressure" annotation(Placement(transformation(origin={100,0},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,0},extent={{-10,-10},{10,10}})));
+  Modelica.Blocks.Interfaces.RealOutput rho(unit="kg/m3")  "Calculated dry-air density" annotation(Placement(transformation(origin={100,-70},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,-70},extent={{-10,-10},{10,10}})));
 equation
   assert(height>=0 and height<=11000,"Troposphere height outside [0,11000] m.");
   T=288.15-0.0065*height;
@@ -18,5 +18,5 @@ equation
         Text(extent={{-61,78},{65,55}}, textString="p, T, rho", textColor={0,0,127}, fontSize=0),
         Text(extent={{-150,155},{150,125}}, textString="%name", textColor={0,0,255}, fontSize=0)
       }),
-    Documentation(info="<html><p><b>Purpose</b> Dry-air troposphere pressure, temperature and density.</p><p><b>Interfaces</b> Modelica.Blocks.Interfaces.RealInput height(unit=\"m\"); Modelica.Blocks.Interfaces.RealOutput T(unit=\"K\"); Modelica.Blocks.Interfaces.RealOutput p(unit=\"Pa\"); Modelica.Blocks.Interfaces.RealOutput rho(unit=\"kg/m3\")</p><p><b>Parameters</b> No tuning parameters; use the declared input contract.</p><p><b>Behavior</b> Dry-air troposphere pressure, temperature and density</p><p><b>Initialization</b> Evaluated from the current inputs and parameter bindings.</p><p><b>Activation and recovery</b> Not applicable.</p><p><b>Limitations</b> Static dry standard air at heights from 0 to 11000 m. No weather or compressible-flow evolution.</p><p><b>Observables</b> T, p, rho</p><p><b>Example</b> <a href=\"modelica://ScenarioLibrary.Examples.EnvironmentalConditions\">ScenarioLibrary.Examples.EnvironmentalConditions</a></p></html>"));
+    Documentation(info="<html><p>Calculate a dry-air tropospheric state from height. Temperature follows <code>T=288.15-0.0065*height</code>; pressure follows the corresponding constant-lapse-rate power law and density uses the ideal-gas relation with gas constant 287.05287 J/(kg.K).</p><p>The height input must lie between 0 and 11000 m. Outputs are absolute temperature, absolute pressure and density. The reference pressure is 101325 Pa at zero height.</p></html>"));
 end Atmosphere;

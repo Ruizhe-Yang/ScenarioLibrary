@@ -1,17 +1,17 @@
 within ScenarioLibrary.Environment;
-model FluidReservoir "沿统一任务剖面变化的外部介质储库"
+model FluidReservoir "Scheduled pressure and temperature fluid boundary"
   replaceable package Medium = Modelica.Media.Air.SimpleAir constrainedby Modelica.Media.Interfaces.PartialMedium;
-  parameter Medium.AbsolutePressure standbyPressure(min=0) = 105000 "待机绝压，Pa";
-  parameter Medium.AbsolutePressure ratedPressure(min=0) = 130000 "运行绝压，Pa";
-  parameter Medium.Temperature standbyTemperature(min=0) = 293.15 "待机温度，K";
-  parameter Medium.Temperature ratedTemperature(min=0) = 303.15 "运行温度，K";
-  parameter Modelica.Units.SI.Time startTime = 1 "调度起点，s";
-  parameter Modelica.Units.SI.Time startupTime(min=Modelica.Constants.small) = 2 "启动爬升时长，s";
-  parameter Modelica.Units.SI.Time operatingTime(min=0) = 5 "额定平台时长，s";
-  parameter Modelica.Units.SI.Time shutdownTime(min=Modelica.Constants.small) = 2 "返回待机时长，s";
-  Modelica.Fluid.Interfaces.FluidPort_b port(redeclare package Medium=Medium) "储库出口，允许回流" annotation(Placement(transformation(extent={{-7,-107},{7,-93}}), iconTransformation(extent={{-7,-107},{7,-93}})));
-  Modelica.Blocks.Interfaces.RealOutput pressure(unit="Pa") "实际边界压力" annotation(Placement(transformation(extent={{94,18},{106,30}}), iconTransformation(extent={{94,18},{106,30}})));
-  Modelica.Blocks.Interfaces.RealOutput temperature(unit="K") "供给流体温度" annotation(Placement(transformation(extent={{94,-30},{106,-18}}), iconTransformation(extent={{94,-30},{106,-18}})));
+  parameter Medium.AbsolutePressure standbyPressure(min=0) = 105000 "Absolute boundary pressure before and after the schedule";
+  parameter Medium.AbsolutePressure ratedPressure(min=0) = 130000 "Absolute boundary pressure on the operating plateau";
+  parameter Medium.Temperature standbyTemperature(min=0) = 293.15 "Supply temperature before and after the schedule";
+  parameter Medium.Temperature ratedTemperature(min=0) = 303.15 "Supply temperature on the operating plateau";
+  parameter Modelica.Units.SI.Time startTime = 1 "Start of the transition from standby";
+  parameter Modelica.Units.SI.Time startupTime(min=Modelica.Constants.small) = 2 "Positive duration of the transition to rated conditions";
+  parameter Modelica.Units.SI.Time operatingTime(min=0) = 5 "Duration of the rated-condition plateau";
+  parameter Modelica.Units.SI.Time shutdownTime(min=Modelica.Constants.small) = 2 "Positive duration of the return to standby";
+  Modelica.Fluid.Interfaces.FluidPort_b port(redeclare package Medium=Medium) "Fluid connection with reversible flow" annotation(Placement(transformation(extent={{-7,-107},{7,-93}}), iconTransformation(extent={{-7,-107},{7,-93}})));
+  Modelica.Blocks.Interfaces.RealOutput pressure(unit="Pa") "Prescribed boundary pressure" annotation(Placement(transformation(extent={{94,18},{106,30}}), iconTransformation(extent={{94,18},{106,30}})));
+  Modelica.Blocks.Interfaces.RealOutput temperature(unit="K") "Prescribed supply temperature" annotation(Placement(transformation(extent={{94,-30},{106,-18}}), iconTransformation(extent={{94,-30},{106,-18}})));
 protected
   ScenarioLibrary.Profiles.StartupHoldShutdown schedule(startTime=startTime,riseTime=startupTime,holdTime=operatingTime,fallTime=shutdownTime);
   Modelica.Fluid.Sources.Boundary_pT reservoir(redeclare package Medium=Medium,nPorts=1,use_p_in=true,use_T_in=true);
@@ -37,29 +37,5 @@ equation
         Text(extent={{-150,155},{150,125}}, textString="%name", textColor={0,0,255}, fontSize=0)
       }),
     Diagram(coordinateSystem(extent={{-100,-100},{100,100}}, preserveAspectRatio=true), graphics={Text(extent={{-96,99},{96,88}}, textColor={30,104,76}, textString="FluidReservoir")}),
-    Documentation(info="<html><p><b>Purpose</b> 沿统一任务剖面变化的外部介质储库</p><p><b>Interfaces</b> Modelica.Fluid.Interfaces.FluidPort_b port(redeclare package Medium=Medium) \"储库出口，允许回流\"; Modelica.Blocks.Interfaces.RealOutput pressure(unit=\"Pa\") \"实际边界压力\"; Modelica.Blocks.Interfaces.RealOutput temperature(unit=\"K\") \"供给流体温度\"</p><p><b>Parameters</b> replaceable package Medium = Modelica.Media.Air.SimpleAir constrainedby Modelica.Media.Interfaces.PartialMedium; parameter Medium.AbsolutePressure standbyPressure(min=0) = 105000 \"待机绝压，Pa\"; parameter Medium.AbsolutePressure ratedPressure(min=0) = 130000 \"运行绝压，Pa\"; parameter Medium.Temperature standbyTemperature(min=0) = 293.15 \"待机温度，K\"; parameter Medium.Temperature ratedTemperature(min=0) = 303.15 \"运行温度，K\"; parameter Modelica.Units.SI.Time startTime = 1 \"调度起点，s\"; parameter Modelica.Units.SI.Time startupTime(min=Modelica.Constants.small) = 2 \"启动爬升时长，s\"; parameter Modelica.Units.SI.Time operatingTime(min=0) = 5 \"额定平台时长，s\"; parameter Modelica.Units.SI.Time shutdownTime(min=Modelica.Constants.small) = 2 \"返回待机时长，s\"</p><p><b>Behavior</b> 沿统一任务剖面变化的外部介质储库</p><p><b>Initialization</b> Use the declared initial values and host state modifiers.</p><p><b>Activation and recovery</b> Not applicable.</p><p><b>Limitations</b> Use the declared parameter range. The catalog identifies simulation coverage.</p><p><b>Observables</b> Inspect the declared output variables.</p><p><b>Example</b> <a href=\"modelica://ScenarioLibrary.Examples.EnvironmentalConditions\">ScenarioLibrary.Examples.EnvironmentalConditions</a></p>
-<p>沿统一任务剖面变化的外部介质储库</p>
-<p>专业分类为 Environment.ExternalMedium。</p>
-<p>接口与方向</p>
-<ul>
-<li><code>Modelica.Fluid.Interfaces.FluidPort_b port(redeclare package Medium=Medium) \"储库出口，允许回流\"</code></li>
-<li><code>Modelica.Blocks.Interfaces.RealOutput pressure(unit=\"Pa\") \"实际边界压力\"</code></li>
-<li><code>Modelica.Blocks.Interfaces.RealOutput temperature(unit=\"K\") \"供给流体温度\"</code></li>
-</ul>
-<p>参数、类型、默认值及约束</p>
-<ul>
-<li><code>replaceable package Medium = Modelica.Media.Air.SimpleAir constrainedby Modelica.Media.Interfaces.PartialMedium</code></li>
-<li><code>Medium.AbsolutePressure standbyPressure(min=0) = 105000 \"待机绝压，Pa\"</code></li>
-<li><code>Medium.AbsolutePressure ratedPressure(min=0) = 130000 \"运行绝压，Pa\"</code></li>
-<li><code>Medium.Temperature standbyTemperature(min=0) = 293.15 \"待机温度，K\"</code></li>
-<li><code>Medium.Temperature ratedTemperature(min=0) = 303.15 \"运行温度，K\"</code></li>
-<li><code>Modelica.Units.SI.Time startTime = 1 \"调度起点，s\"</code></li>
-<li><code>Modelica.Units.SI.Time startupTime(min=Modelica.Constants.small) = 2 \"启动爬升时长，s\"</code></li>
-<li><code>Modelica.Units.SI.Time operatingTime(min=0) = 5 \"额定平台时长，s\"</code></li>
-<li><code>Modelica.Units.SI.Time shutdownTime(min=Modelica.Constants.small) = 2 \"返回待机时长，s\"</code></li>
-</ul>
-<p><b>时序与基准行为</b> 压力与供给温度同步线性变化，待机与额定均为明确边界。回流焓由宿主决定。</p>
-<p><b>最小用法</b> redeclare 宿主介质，提供 inner System，port 接有压降或储能元件。 <a href=\"modelica://ScenarioLibrary.Examples.MultiphaseMission\">FluidOperatingScenario</a> 展示同域接线。</p>
-<p><b>适用边界</b> 储库为理想边界，容量和介质组分沿用 MSL 默认；避免直接连接另一独立压力源。</p>
-</html>"));
+    Documentation(info="<html><p>Drive a Modelica.Fluid pressure-temperature boundary with one common startup, hold and shutdown profile. Pressure and temperature interpolate from their standby values to rated values and then return to standby. All four boundary targets must be positive.</p><p>Redeclare <code>Medium</code> consistently with the connected network and connect <code>port</code>, which permits flow reversal. The pressure and temperature outputs expose the prescribed boundary signals. This model is an ideal boundary and contains no finite mass or energy inventory.</p></html>"));
 end FluidReservoir;

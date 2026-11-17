@@ -1,12 +1,12 @@
 within ScenarioLibrary.Operating;
-block TorqueSpeedMap "以转速表定义正常台架负载转矩指令"
-  parameter Integer n(min=2) = 3;
-  parameter Real points[n,2] = [0,0;10,1;30,3] "Positive speed rad/s and opposing torque magnitude N.m";
-  Modelica.Blocks.Interfaces.RealInput speed(unit="rad/s") annotation(Placement(transformation(extent={{-106,-6},{-94,6}}), iconTransformation(extent={{-106,-6},{-94,6}})));
-  Modelica.Blocks.Interfaces.RealOutput torque(unit="N.m") "Opposing signed demand" annotation(Placement(transformation(extent={{94,-6},{106,6}}), iconTransformation(extent={{94,-6},{106,6}})));
+block TorqueSpeedMap "Signed opposing torque from an absolute-speed table"
+  parameter Integer n(min=2) = 3 "Number of speed-torque table nodes";
+  parameter Real points[n,2] = [0,0;10,1;30,3] "Absolute angular speed and opposing torque magnitude pairs";
+  Modelica.Blocks.Interfaces.RealInput speed(unit="rad/s")  "Signed angular speed" annotation(Placement(transformation(extent={{-106,-6},{-94,6}}), iconTransformation(extent={{-106,-6},{-94,6}})));
+  Modelica.Blocks.Interfaces.RealOutput torque(unit="N.m") "Signed torque command opposing rotation" annotation(Placement(transformation(extent={{94,-6},{106,6}}), iconTransformation(extent={{94,-6},{106,6}})));
 protected
   Modelica.Blocks.Tables.CombiTable1Ds profile(table=points,columns={2},
-    smoothness=Modelica.Blocks.Types.Smoothness.LinearSegments,extrapolation=Modelica.Blocks.Types.Extrapolation.HoldLastPoint);
+    smoothness=Modelica.Blocks.Types.Smoothness.LinearSegments,extrapolation=Modelica.Blocks.Types.Extrapolation.HoldLastPoint) "Linear table of torque magnitude against absolute speed";
 initial equation
   assert(n>=2 and abs(points[1,1])<=1e-12 and abs(points[1,2])<=1e-12 and
     min(points[:,2])>=0 and min(points[2:n,1]-points[1:n-1,1])>0,"Invalid torque map.");
@@ -24,21 +24,5 @@ equation
         Text(extent={{-150,155},{150,125}}, textString="%name", textColor={0,0,255}, fontSize=0)
       }),
     Diagram(coordinateSystem(extent={{-100,-100},{100,100}})),
-    Documentation(info="<html><p><b>Purpose</b> 以转速表定义正常台架负载转矩指令</p><p><b>Interfaces</b> Modelica.Blocks.Interfaces.RealInput speed(unit=\"rad/s\"); Modelica.Blocks.Interfaces.RealOutput torque(unit=\"N.m\") \"Opposing signed demand\"</p><p><b>Parameters</b> parameter Integer n(min=2) = 3; parameter Real points[n,2] = [0,0;10,1;30,3] \"Positive speed rad/s and opposing torque magnitude N.m\"</p><p><b>Behavior</b> 以转速表定义正常台架负载转矩指令</p><p><b>Initialization</b> Use the declared initial values and host state modifiers.</p><p><b>Activation and recovery</b> Not applicable.</p><p><b>Limitations</b> Use the declared parameter range. The catalog identifies simulation coverage.</p><p><b>Observables</b> Inspect the declared output variables.</p><p><b>Example</b> <a href=\"modelica://ScenarioLibrary.Examples.LoadAndCommandSchedules\">ScenarioLibrary.Examples.LoadAndCommandSchedules</a></p>
-<p>以转速表定义正常台架负载转矩指令</p>
-<p><b>行为</b> 用绝对转速查询负载幅值，符号与运动相反。表首为零，高速侧保持最大端值。</p>
-<p><b>最小用法</b> 将实测转速和试验负载表接入，再把 torque 接理想或受限执行器。</p>
-<p><b>适用边界</b> 该映射规定外部负载要求，无执行器动力学。</p>
-<p>参数的类型、默认值和取值见下列声明。</p>
-<ul>
-<li><code>Integer n(min=2) = 3</code></li>
-<li><code>Real points[n,2] = [0,0;10,1;30,3] \"Positive speed rad/s and opposing torque magnitude N.m\"</code></li>
-</ul>
-<p>接口及方向</p>
-<ul>
-<li><code>Modelica.Blocks.Interfaces.RealInput speed(unit=\"rad/s\")</code></li>
-<li><code>Modelica.Blocks.Interfaces.RealOutput torque(unit=\"N.m\") \"Opposing signed demand\"</code></li>
-</ul>
-<p><a href=\"modelica://ScenarioLibrary.Examples.MultiphaseMission\">MultiPhaseSystemScenario</a> 提供同域宿主参考。</p>
-</html>"));
+    Documentation(info="<html><p>Interpolate a nonnegative torque magnitude against <code>abs(speed)</code>, then apply <code>-sign(speed)</code> so the command opposes rotation. At zero speed the torque is zero; beyond the table range the final magnitude is held.</p><p>The table must contain at least two nodes, begin at zero speed and zero torque, and use strictly increasing speed coordinates. This block provides a torque signal rather than a mechanical connection.</p></html>"));
 end TorqueSpeedMap;

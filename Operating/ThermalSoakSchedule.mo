@@ -1,15 +1,15 @@
 within ScenarioLibrary.Operating;
-block ThermalSoakSchedule "定义停机后的外部热浸泡参考和再启动标记"
-  parameter Modelica.Units.SI.Time shutdownAt = 5;
-  parameter Modelica.Units.SI.Time soakDuration(min=Modelica.Constants.small) = 20;
-  parameter Modelica.Units.SI.Time coolingTime(min=Modelica.Constants.small) = 12;
-  parameter Modelica.Units.SI.Temperature operatingTemperature(min=0) = 350;
-  parameter Modelica.Units.SI.Temperature ambientTemperature(min=0) = 293.15;
+block ThermalSoakSchedule "Exponential thermal reference with soak and restart markers"
+  parameter Modelica.Units.SI.Time shutdownAt = 5 "Absolute start of the exponential thermal reference";
+  parameter Modelica.Units.SI.Time soakDuration(min=Modelica.Constants.small) = 20 "Positive duration of the scheduled soak interval";
+  parameter Modelica.Units.SI.Time coolingTime(min=Modelica.Constants.small) = 12 "Positive time constant of the thermal reference";
+  parameter Modelica.Units.SI.Temperature operatingTemperature(min=0) = 350 "Reference temperature before shutdown";
+  parameter Modelica.Units.SI.Temperature ambientTemperature(min=0) = 293.15 "Asymptotic reference temperature";
   Modelica.Blocks.Interfaces.RealOutput temperature(unit="K") "Prescribed thermal reference" annotation(Placement(transformation(extent={{94,42},{106,54}}), iconTransformation(extent={{94,42},{106,54}})));
-  Modelica.Blocks.Interfaces.BooleanOutput soaking annotation(Placement(transformation(extent={{94,-6},{106,6}}), iconTransformation(extent={{94,-6},{106,6}})));
-  Modelica.Blocks.Interfaces.BooleanOutput restartDue "Scheduled restart time has passed" annotation(Placement(transformation(extent={{94,-54},{106,-42}}), iconTransformation(extent={{94,-54},{106,-42}})));
+  Modelica.Blocks.Interfaces.BooleanOutput soaking  "The scheduled soak interval is active" annotation(Placement(transformation(extent={{94,-6},{106,6}}), iconTransformation(extent={{94,-6},{106,6}})));
+  Modelica.Blocks.Interfaces.BooleanOutput restartDue "The scheduled restart instant has been reached" annotation(Placement(transformation(extent={{94,-54},{106,-42}}), iconTransformation(extent={{94,-54},{106,-42}})));
 protected
-  Modelica.Units.SI.Time age;
+  Modelica.Units.SI.Time age "Nonnegative elapsed time since shutdown";
 initial equation
   assert(soakDuration>0 and coolingTime>0 and min(operatingTemperature,ambientTemperature)>0,"Invalid thermal soak.");
 equation
@@ -28,25 +28,5 @@ equation
         Text(extent={{-150,155},{150,125}}, textString="%name", textColor={0,0,255}, fontSize=0)
       }),
     Diagram(coordinateSystem(extent={{-100,-100},{100,100}})),
-    Documentation(info="<html><p><b>Purpose</b> 定义停机后的外部热浸泡参考和再启动标记</p><p><b>Interfaces</b> Modelica.Blocks.Interfaces.RealOutput temperature(unit=\"K\") \"Prescribed thermal reference\"; Modelica.Blocks.Interfaces.BooleanOutput soaking; Modelica.Blocks.Interfaces.BooleanOutput restartDue \"Scheduled restart time has passed\"</p><p><b>Parameters</b> parameter Modelica.Units.SI.Time shutdownAt = 5; parameter Modelica.Units.SI.Time soakDuration(min=Modelica.Constants.small) = 20; parameter Modelica.Units.SI.Time coolingTime(min=Modelica.Constants.small) = 12; parameter Modelica.Units.SI.Temperature operatingTemperature(min=0) = 350; parameter Modelica.Units.SI.Temperature ambientTemperature(min=0) = 293.15</p><p><b>Behavior</b> 定义停机后的外部热浸泡参考和再启动标记</p><p><b>Initialization</b> Use the declared initial values and host state modifiers.</p><p><b>Activation and recovery</b> Not applicable.</p><p><b>Limitations</b> Use the declared parameter range. The catalog identifies simulation coverage.</p><p><b>Observables</b> Inspect the declared output variables.</p><p><b>Example</b> <a href=\"modelica://ScenarioLibrary.Examples.LoadAndCommandSchedules\">ScenarioLibrary.Examples.LoadAndCommandSchedules</a></p>
-<p>定义停机后的外部热浸泡参考和再启动标记</p>
-<p><b>行为</b> 停机前给定运行参考，停机后按已配置指数曲线给定热参考。再启动标记只由时间表决定。</p>
-<p><b>最小用法</b> 温度接规定温度源，restartDue 接外部任务逻辑。</p>
-<p><b>适用边界</b> 它描述外部边界参考。设备的实际冷却、残余能量和再启动许可由宿主求解。</p>
-<p>参数的类型、默认值和取值见下列声明。</p>
-<ul>
-<li><code>Modelica.Units.SI.Time shutdownAt = 5</code></li>
-<li><code>Modelica.Units.SI.Time soakDuration(min=Modelica.Constants.small) = 20</code></li>
-<li><code>Modelica.Units.SI.Time coolingTime(min=Modelica.Constants.small) = 12</code></li>
-<li><code>Modelica.Units.SI.Temperature operatingTemperature(min=0) = 350</code></li>
-<li><code>Modelica.Units.SI.Temperature ambientTemperature(min=0) = 293.15</code></li>
-</ul>
-<p>接口及方向</p>
-<ul>
-<li><code>Modelica.Blocks.Interfaces.RealOutput temperature(unit=\"K\") \"Prescribed thermal reference\"</code></li>
-<li><code>Modelica.Blocks.Interfaces.BooleanOutput soaking</code></li>
-<li><code>Modelica.Blocks.Interfaces.BooleanOutput restartDue \"Scheduled restart time has passed\"</code></li>
-</ul>
-<p><a href=\"modelica://ScenarioLibrary.Examples.MultiphaseMission\">ThermalCycleScenario</a> 提供同域宿主参考。</p>
-</html>"));
+    Documentation(info="<html><p>Hold <code>operatingTemperature</code> before <code>shutdownAt</code>, then relax exponentially towards <code>ambientTemperature</code> with time constant <code>coolingTime</code>. Both temperatures and the duration parameters must be positive.</p><p><code>soaking</code> is true during <code>[shutdownAt,shutdownAt+soakDuration)</code>; <code>restartDue</code> becomes true afterwards. The temperature trajectory continues beyond the soak interval, and the restart marker does not reset it.</p></html>"));
 end ThermalSoakSchedule;

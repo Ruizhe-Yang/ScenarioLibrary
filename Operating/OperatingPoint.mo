@@ -1,12 +1,12 @@
 within ScenarioLibrary.Operating;
-block OperatingPoint "Fixed vector with per-channel metadata"
-parameter Integer n(min=1)=1;
-  parameter Real values[n]=fill(0,n);
-  parameter String names[n]={"channel "+String(i) for i in 1:n};
-  parameter String units[n]=fill("1",n);
-  parameter Real lower[n]=fill(-Modelica.Constants.inf,n);
-  parameter Real upper[n]=fill(Modelica.Constants.inf,n);
-  Modelica.Blocks.Interfaces.RealOutput y[n] annotation(Placement(transformation(origin={100,0},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,0},extent={{-10,-10},{10,10}})));
+block OperatingPoint "Constant operating vector with channel metadata"
+parameter Integer n(min=1)=1 "Number of operating-point channels";
+  parameter Real values[n]=fill(0,n) "Constant operating-point values";
+  parameter String names[n]={"channel "+String(i) for i in 1:n} "Descriptive channel names";
+  parameter String units[n]=fill("1",n) "Descriptive channel units; no unit conversion is performed";
+  parameter Real lower[n]=fill(-Modelica.Constants.inf,n) "Lower accepted value for each channel";
+  parameter Real upper[n]=fill(Modelica.Constants.inf,n) "Upper accepted value for each channel";
+  Modelica.Blocks.Interfaces.RealOutput y[n]  "Constant operating-point vector" annotation(Placement(transformation(origin={100,0},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,0},extent={{-10,-10},{10,10}})));
 initial equation
   for i in 1:n loop assert(lower[i]<=values[i] and values[i]<=upper[i],"Operating point outside declared range."); end for;
 equation
@@ -22,5 +22,5 @@ equation
         Text(extent={{-39,-21},{39,-47}}, textString="x3", textColor={0,0,127}, fontSize=0),
         Text(extent={{-150,155},{150,125}}, textString="%name", textColor={0,0,255}, fontSize=0)
       }),
-    Documentation(info="<html><p><b>Purpose</b> Fixed vector with per-channel metadata.</p><p><b>Interfaces</b> Modelica.Blocks.Interfaces.RealOutput y[n]</p><p><b>Parameters</b> parameter Integer n(min=1)=1; parameter Real values[n]=fill(0,n); parameter String names[n]={\"channel \"+String(i) for i in 1:n}; parameter String units[n]=fill(\"1\",n); parameter Real lower[n]=fill(-Modelica.Constants.inf,n); parameter Real upper[n]=fill(Modelica.Constants.inf,n)</p><p><b>Behavior</b> Fixed vector with per-channel metadata</p><p><b>Initialization</b> The declared start values and initialization equations apply.</p><p><b>Activation and recovery</b> Not applicable.</p><p><b>Limitations</b> Outputs retain the units declared at the interface. Numerical values depend on the supplied input and parameter range.</p><p><b>Observables</b> y</p><p><b>Example</b> <a href=\"modelica://ScenarioLibrary.Examples.LoadAndCommandSchedules\">ScenarioLibrary.Examples.LoadAndCommandSchedules</a></p></html>"));
+    Documentation(info="<html><p>Output the configured <code>values[n]</code> without time variation. Initial assertions check each value against its own lower and upper bounds.</p><p><code>names</code> and <code>units</code> describe channels; they do not alter the output equations or perform unit conversion. Match these conventions to the receiving signals.</p></html>"));
 end OperatingPoint;

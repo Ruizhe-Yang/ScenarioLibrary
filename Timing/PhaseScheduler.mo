@@ -1,15 +1,15 @@
 within ScenarioLibrary.Timing;
-block PhaseScheduler "按阶段持续时间组织一次任务的连续时间轴"
-  parameter Integer n(min=1) = 3 "阶段数量";
-  parameter Modelica.Units.SI.Time startTime = 0 "任务起点，s";
-  parameter Modelica.Units.SI.Time durations[n](each min=Modelica.Constants.small) = fill(2,n) "各阶段长度，s";
-  Modelica.Blocks.Interfaces.IntegerOutput phase "运行中的阶段索引 1..n；未开始或已完成时为 0" annotation(Placement(transformation(extent={{94,66},{106,78}}), iconTransformation(extent={{94,66},{106,78}})));
-  Modelica.Blocks.Interfaces.BooleanOutput completed "最后阶段已结束" annotation(Placement(transformation(extent={{94,18},{106,30}}), iconTransformation(extent={{94,18},{106,30}})));
-  Modelica.Blocks.Interfaces.RealOutput elapsed(unit="s") "本阶段已运行时长，阶段外为零" annotation(Placement(transformation(extent={{94,-30},{106,-18}}), iconTransformation(extent={{94,-30},{106,-18}})));
-  Modelica.Blocks.Interfaces.RealOutput remaining(unit="s") "本阶段剩余时长，阶段外为零" annotation(Placement(transformation(extent={{94,-78},{106,-66}}), iconTransformation(extent={{94,-78},{106,-66}})));
+block PhaseScheduler "Consecutive phases defined by positive durations"
+  parameter Integer n(min=1) = 3 "Number of consecutive phases";
+  parameter Modelica.Units.SI.Time startTime = 0 "Inclusive start of the absolute schedule";
+  parameter Modelica.Units.SI.Time durations[n](each min=Modelica.Constants.small) = fill(2,n) "Positive phase durations";
+  Modelica.Blocks.Interfaces.IntegerOutput phase "Current phase index, or zero outside the schedule" annotation(Placement(transformation(extent={{94,66},{106,78}}), iconTransformation(extent={{94,66},{106,78}})));
+  Modelica.Blocks.Interfaces.BooleanOutput completed "True once the scheduled end has been reached" annotation(Placement(transformation(extent={{94,18},{106,30}}), iconTransformation(extent={{94,18},{106,30}})));
+  Modelica.Blocks.Interfaces.RealOutput elapsed(unit="s") "Elapsed time within the current phase, or zero" annotation(Placement(transformation(extent={{94,-30},{106,-18}}), iconTransformation(extent={{94,-30},{106,-18}})));
+  Modelica.Blocks.Interfaces.RealOutput remaining(unit="s") "Time remaining in the current phase, or zero" annotation(Placement(transformation(extent={{94,-78},{106,-66}}), iconTransformation(extent={{94,-78},{106,-66}})));
 protected
-  final parameter Modelica.Units.SI.Time ends[n] = {startTime+sum(durations[1:i]) for i in 1:n};
-  Integer passed;
+  final parameter Modelica.Units.SI.Time ends[n] = {startTime+sum(durations[1:i]) for i in 1:n} "Absolute phase end times";
+  Integer passed "Number of phase ends reached";
 initial equation
   assert(n >= 1 and min(durations) > 0, "All mission phases must have positive duration.");
 equation
@@ -33,24 +33,5 @@ equation
         Text(extent={{-150,155},{150,125}}, textString="%name", textColor={0,0,255}, fontSize=0)
       }),
     Diagram(coordinateSystem(extent={{-100,-100},{100,100}}, preserveAspectRatio=true), graphics={Text(extent={{-96,99},{96,88}}, textColor={30,104,76}, textString="PhaseScheduler")}),
-    Documentation(info="<html><p><b>Purpose</b> 按阶段持续时间组织一次任务的连续时间轴</p><p><b>Interfaces</b> Modelica.Blocks.Interfaces.IntegerOutput phase \"运行中的阶段索引 1..n；未开始或已完成时为 0\"; Modelica.Blocks.Interfaces.BooleanOutput completed \"最后阶段已结束\"; Modelica.Blocks.Interfaces.RealOutput elapsed(unit=\"s\") \"本阶段已运行时长，阶段外为零\"; Modelica.Blocks.Interfaces.RealOutput remaining(unit=\"s\") \"本阶段剩余时长，阶段外为零\"</p><p><b>Parameters</b> parameter Integer n(min=1) = 3 \"阶段数量\"; parameter Modelica.Units.SI.Time startTime = 0 \"任务起点，s\"; parameter Modelica.Units.SI.Time durations[n](each min=Modelica.Constants.small) = fill(2,n) \"各阶段长度，s\"</p><p><b>Behavior</b> 按阶段持续时间组织一次任务的连续时间轴</p><p><b>Initialization</b> Use the declared initial values and host state modifiers.</p><p><b>Activation and recovery</b> Not applicable.</p><p><b>Limitations</b> Use the declared parameter range. The catalog identifies simulation coverage.</p><p><b>Observables</b> Inspect the declared output variables.</p><p><b>Example</b> <a href=\"modelica://ScenarioLibrary.Examples.PhaseQualifiedWindows\">ScenarioLibrary.Examples.PhaseQualifiedWindows</a></p>
-<p>按阶段持续时间组织一次任务的连续时间轴</p>
-<p>专业分类为 TimelineAndScheduling.Phase。</p>
-<p>接口与方向</p>
-<ul>
-<li><code>Modelica.Blocks.Interfaces.IntegerOutput phase \"运行中的阶段索引 1..n；未开始或已完成时为 0\"</code></li>
-<li><code>Modelica.Blocks.Interfaces.BooleanOutput completed \"最后阶段已结束\"</code></li>
-<li><code>Modelica.Blocks.Interfaces.RealOutput elapsed(unit=\"s\") \"本阶段已运行时长，阶段外为零\"</code></li>
-<li><code>Modelica.Blocks.Interfaces.RealOutput remaining(unit=\"s\") \"本阶段剩余时长，阶段外为零\"</code></li>
-</ul>
-<p>参数、类型、默认值及约束</p>
-<ul>
-<li><code>Integer n(min=1) = 3 \"阶段数量\"</code></li>
-<li><code>Modelica.Units.SI.Time startTime = 0 \"任务起点，s\"</code></li>
-<li><code>Modelica.Units.SI.Time durations[n](each min=Modelica.Constants.small) = fill(2,n) \"各阶段长度，s\"</code></li>
-</ul>
-<p><b>时序与基准行为</b> 阶段左闭右开，恰好到段尾即进入下一段。完成后 phase 回到 0，completed 保持真。</p>
-<p><b>最小用法</b> 用 durations={2,4,1} 安排预备、运行和收尾，接 phase 与宿主任务曲线。 <a href=\"modelica://ScenarioLibrary.Examples.MultiphaseMission\">MultiPhaseSystemScenario</a> 展示同域接线。</p>
-<p><b>适用边界</b> 阶段由确定时间表驱动。禁止零时长导致跳过索引。</p>
-</html>"));
+    Documentation(info="<html><p>Build consecutive phases from <code>startTime</code> and the positive entries of <code>durations</code>. The active phase includes its start and excludes its end. <code>elapsed</code> and <code>remaining</code> report the current phase timing.</p><p><code>phase</code>, <code>elapsed</code> and <code>remaining</code> are zero before the first phase and after the final phase. <code>completed</code> becomes true at the final end time. This is an absolute schedule with no pause or restart input.</p></html>"));
 end PhaseScheduler;

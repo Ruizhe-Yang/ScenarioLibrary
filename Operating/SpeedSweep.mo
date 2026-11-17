@@ -1,14 +1,14 @@
 within ScenarioLibrary.Operating;
-block SpeedSweep "给出对数分布的正向角速度扫描"
-  parameter Modelica.Units.SI.AngularVelocity startSpeed(min=Modelica.Constants.small) = 2 "初始速度，rad/s";
-  parameter Modelica.Units.SI.AngularVelocity endSpeed(min=Modelica.Constants.small) = 12 "终止速度，rad/s";
-  parameter Modelica.Units.SI.Time startTime = 1 "扫描起点，s";
-  parameter Modelica.Units.SI.Time duration(min=Modelica.Constants.small) = 6 "扫描时长，s";
-  Modelica.Blocks.Interfaces.RealOutput speed(unit="rad/s") "转速指令" annotation(Placement(transformation(extent={{94,18},{106,30}}), iconTransformation(extent={{94,18},{106,30}})));
-  Modelica.Blocks.Interfaces.RealOutput acceleration(unit="rad/s2") "扫描段的解析角加速度" annotation(Placement(transformation(extent={{94,-30},{106,-18}}), iconTransformation(extent={{94,-30},{106,-18}})));
+block SpeedSweep "Logarithmic angular-speed sweep with held endpoints"
+  parameter Modelica.Units.SI.AngularVelocity startSpeed(min=Modelica.Constants.small) = 2 "Positive angular speed before the sweep";
+  parameter Modelica.Units.SI.AngularVelocity endSpeed(min=Modelica.Constants.small) = 12 "Positive angular speed after the sweep";
+  parameter Modelica.Units.SI.Time startTime = 1 "Absolute start of the angular-speed sweep";
+  parameter Modelica.Units.SI.Time duration(min=Modelica.Constants.small) = 6 "Positive duration of the logarithmic sweep";
+  Modelica.Blocks.Interfaces.RealOutput speed(unit="rad/s") "Prescribed angular-speed trajectory" annotation(Placement(transformation(extent={{94,18},{106,30}}), iconTransformation(extent={{94,18},{106,30}})));
+  Modelica.Blocks.Interfaces.RealOutput acceleration(unit="rad/s2") "Analytical angular acceleration within the sweep, zero outside" annotation(Placement(transformation(extent={{94,-30},{106,-18}}), iconTransformation(extent={{94,-30},{106,-18}})));
 protected
-  final parameter Real span = log(endSpeed/startSpeed);
-  Real progress;
+  final parameter Real span = log(endSpeed/startSpeed) "Logarithm of the end-to-start speed ratio";
+  Real progress "Normalised progress clamped to the sweep interval";
 initial equation
   assert(startSpeed > 0 and endSpeed > 0 and duration > 0, "Positive speeds and duration required.");
 equation
@@ -25,23 +25,5 @@ equation
         Text(extent={{-150,155},{150,125}}, textString="%name", textColor={0,0,255}, fontSize=0)
       }),
     Diagram(coordinateSystem(extent={{-100,-100},{100,100}}, preserveAspectRatio=true), graphics={Text(extent={{-96,99},{96,88}}, textColor={30,104,76}, textString="SpeedSweep")}),
-    Documentation(info="<html><p><b>Purpose</b> 给出对数分布的正向角速度扫描</p><p><b>Interfaces</b> Modelica.Blocks.Interfaces.RealOutput speed(unit=\"rad/s\") \"转速指令\"; Modelica.Blocks.Interfaces.RealOutput acceleration(unit=\"rad/s2\") \"扫描段的解析角加速度\"</p><p><b>Parameters</b> parameter Modelica.Units.SI.AngularVelocity startSpeed(min=Modelica.Constants.small) = 2 \"初始速度，rad/s\"; parameter Modelica.Units.SI.AngularVelocity endSpeed(min=Modelica.Constants.small) = 12 \"终止速度，rad/s\"; parameter Modelica.Units.SI.Time startTime = 1 \"扫描起点，s\"; parameter Modelica.Units.SI.Time duration(min=Modelica.Constants.small) = 6 \"扫描时长，s\"</p><p><b>Behavior</b> 给出对数分布的正向角速度扫描</p><p><b>Initialization</b> Use the declared initial values and host state modifiers.</p><p><b>Activation and recovery</b> Not applicable.</p><p><b>Limitations</b> Use the declared parameter range. The catalog identifies simulation coverage.</p><p><b>Observables</b> Inspect the declared output variables.</p><p><b>Example</b> <a href=\"modelica://ScenarioLibrary.Examples.LoadAndCommandSchedules\">ScenarioLibrary.Examples.LoadAndCommandSchedules</a></p>
-<p>给出对数分布的正向角速度扫描</p>
-<p>专业分类为 ExternalInputs.Velocity。</p>
-<p>接口与方向</p>
-<ul>
-<li><code>Modelica.Blocks.Interfaces.RealOutput speed(unit=\"rad/s\") \"转速指令\"</code></li>
-<li><code>Modelica.Blocks.Interfaces.RealOutput acceleration(unit=\"rad/s2\") \"扫描段的解析角加速度\"</code></li>
-</ul>
-<p>参数、类型、默认值及约束</p>
-<ul>
-<li><code>Modelica.Units.SI.AngularVelocity startSpeed(min=Modelica.Constants.small) = 2 \"初始速度，rad/s\"</code></li>
-<li><code>Modelica.Units.SI.AngularVelocity endSpeed(min=Modelica.Constants.small) = 12 \"终止速度，rad/s\"</code></li>
-<li><code>Modelica.Units.SI.Time startTime = 1 \"扫描起点，s\"</code></li>
-<li><code>Modelica.Units.SI.Time duration(min=Modelica.Constants.small) = 6 \"扫描时长，s\"</code></li>
-</ul>
-<p><b>时序与基准行为</b> 扫描前后持有两端速度。内部等时间步产生等比例变化，支持向上或向下扫描。</p>
-<p><b>最小用法</b> 用于按数量级覆盖转速的正常驱动任务。 <a href=\"modelica://ScenarioLibrary.Examples.MultiphaseMission\">MultiPhaseSystemScenario</a> 展示同域接线。</p>
-<p><b>适用边界</b> 两端速度均须为正，不能扫描过零。加速度在边界可跳变。</p>
-</html>"));
+    Documentation(info="<html><p>Vary positive angular speed exponentially between <code>startSpeed</code> and <code>endSpeed</code> over the positive <code>duration</code>. Hold the start and end values before and after the absolute sweep interval. An end speed below the start speed gives a decreasing sweep.</p><p><code>acceleration</code> is the analytical derivative during the half-open sweep interval and zero outside it. Speed is continuous; acceleration can jump at the endpoints.</p></html>"));
 end SpeedSweep;

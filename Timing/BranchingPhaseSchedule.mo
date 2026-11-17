@@ -1,20 +1,20 @@
 within ScenarioLibrary.Timing;
-block BranchingPhaseSchedule "在指定阶段边界读取一次计划跳转"
-  parameter Integer n(min=3) = 4;
-  parameter Modelica.Units.SI.Time startTime = 0;
-  parameter Modelica.Units.SI.Time durations[n](each min=Modelica.Constants.small) = fill(2,n);
-  parameter Integer branchFrom(min=1,max=n-2) = 2;
-  parameter Integer branchTo(min=branchFrom+2,max=n) = 4;
-  Modelica.Blocks.Interfaces.BooleanInput jumpRequested "Read at the selected boundary" annotation(Placement(transformation(extent={{-106,-6},{-94,6}}), iconTransformation(extent={{-106,-6},{-94,6}})));
-  Modelica.Blocks.Interfaces.IntegerOutput phase "Scheduled stage, 0 outside active mission" annotation(Placement(transformation(extent={{94,66},{106,78}}), iconTransformation(extent={{94,66},{106,78}})));
-  Modelica.Blocks.Interfaces.BooleanOutput jumped(start=false,fixed=true) annotation(Placement(transformation(extent={{94,18},{106,30}}), iconTransformation(extent={{94,18},{106,30}})));
-  Modelica.Blocks.Interfaces.BooleanOutput completed annotation(Placement(transformation(extent={{94,-30},{106,-18}}), iconTransformation(extent={{94,-30},{106,-18}})));
-  Modelica.Blocks.Interfaces.RealOutput elapsed(unit="s") "Elapsed time within stage" annotation(Placement(transformation(extent={{94,-78},{106,-66}}), iconTransformation(extent={{94,-78},{106,-66}})));
+block BranchingPhaseSchedule "Single-branch phase schedule with a boundary-sampled decision"
+  parameter Integer n(min=3) = 4 "Number of scheduled phases";
+  parameter Modelica.Units.SI.Time startTime = 0 "Inclusive start of the absolute schedule";
+  parameter Modelica.Units.SI.Time durations[n](each min=Modelica.Constants.small) = fill(2,n) "Positive phase durations";
+  parameter Integer branchFrom(min=1,max=n-2) = 2 "Phase whose end samples the jump request";
+  parameter Integer branchTo(min=branchFrom+2,max=n) = 4 "Phase entered when the jump is accepted";
+  Modelica.Blocks.Interfaces.BooleanInput jumpRequested "Planned jump request sampled at the selected boundary" annotation(Placement(transformation(extent={{-106,-6},{-94,6}}), iconTransformation(extent={{-106,-6},{-94,6}})));
+  Modelica.Blocks.Interfaces.IntegerOutput phase "Scheduled phase index, or zero outside the mission" annotation(Placement(transformation(extent={{94,66},{106,78}}), iconTransformation(extent={{94,66},{106,78}})));
+  Modelica.Blocks.Interfaces.BooleanOutput jumped(start=false,fixed=true)  "Retained jump decision" annotation(Placement(transformation(extent={{94,18},{106,30}}), iconTransformation(extent={{94,18},{106,30}})));
+  Modelica.Blocks.Interfaces.BooleanOutput completed  "True once the scheduled end has been reached" annotation(Placement(transformation(extent={{94,-30},{106,-18}}), iconTransformation(extent={{94,-30},{106,-18}})));
+  Modelica.Blocks.Interfaces.RealOutput elapsed(unit="s") "Elapsed time within the current phase" annotation(Placement(transformation(extent={{94,-78},{106,-66}}), iconTransformation(extent={{94,-78},{106,-66}})));
 protected
-  final parameter Modelica.Units.SI.Time ends[n] = {startTime+sum(durations[1:i]) for i in 1:n};
-  final parameter Modelica.Units.SI.Time skipDuration = sum(durations[branchFrom+1:branchTo-1]);
-  Modelica.Units.SI.Time effectiveTime;
-  Integer passed;
+  final parameter Modelica.Units.SI.Time ends[n] = {startTime+sum(durations[1:i]) for i in 1:n} "Absolute end times before any phase skip";
+  final parameter Modelica.Units.SI.Time skipDuration = sum(durations[branchFrom+1:branchTo-1]) "Duration removed by the accepted jump";
+  Modelica.Units.SI.Time effectiveTime "Absolute time advanced by the skipped duration";
+  Integer passed "Number of phase ends reached on the effective timeline";
 initial equation
   assert(n>=3 and min(durations)>0 and branchFrom>=1 and branchTo>=branchFrom+2 and branchTo<=n,"Invalid branch schedule.");
 equation
@@ -41,27 +41,5 @@ equation
         Text(extent={{-150,155},{150,125}}, textString="%name", textColor={0,0,255}, fontSize=0)
       }),
     Diagram(coordinateSystem(extent={{-100,-100},{100,100}})),
-    Documentation(info="<html><p><b>Purpose</b> 在指定阶段边界读取一次计划跳转</p><p><b>Interfaces</b> Modelica.Blocks.Interfaces.BooleanInput jumpRequested \"Read at the selected boundary\"; Modelica.Blocks.Interfaces.IntegerOutput phase \"Scheduled stage, 0 outside active mission\"; Modelica.Blocks.Interfaces.BooleanOutput jumped(start=false,fixed=true); Modelica.Blocks.Interfaces.BooleanOutput completed; Modelica.Blocks.Interfaces.RealOutput elapsed(unit=\"s\") \"Elapsed time within stage\"</p><p><b>Parameters</b> parameter Integer n(min=3) = 4; parameter Modelica.Units.SI.Time startTime = 0; parameter Modelica.Units.SI.Time durations[n](each min=Modelica.Constants.small) = fill(2,n); parameter Integer branchFrom(min=1,max=n-2) = 2; parameter Integer branchTo(min=branchFrom+2,max=n) = 4</p><p><b>Behavior</b> 在指定阶段边界读取一次计划跳转</p><p><b>Initialization</b> Use the declared initial values and host state modifiers.</p><p><b>Activation and recovery</b> Not applicable.</p><p><b>Limitations</b> Use the declared parameter range. The catalog identifies simulation coverage.</p><p><b>Observables</b> Inspect the declared output variables.</p><p><b>Example</b> <a href=\"modelica://ScenarioLibrary.Examples.PhaseQualifiedWindows\">ScenarioLibrary.Examples.PhaseQualifiedWindows</a></p>
-<p>在指定阶段边界读取一次计划跳转</p>
-<p><b>行为</b> 仅在 branchFrom 末端读取跳转标志。真时跳过中间阶段，后续物理时长维持原定义。</p>
-<p><b>最小用法</b> 例如 n=4、branchFrom=2、branchTo=4 时可选择跳过第 3 段。</p>
-<p><b>适用边界</b> 只允许一次向前计划分支。控制安全判定不由此块提供。</p>
-<p>参数的类型、默认值和取值见下列声明。</p>
-<ul>
-<li><code>Integer n(min=3) = 4</code></li>
-<li><code>Modelica.Units.SI.Time startTime = 0</code></li>
-<li><code>Modelica.Units.SI.Time durations[n](each min=Modelica.Constants.small) = fill(2,n)</code></li>
-<li><code>Integer branchFrom(min=1,max=n-2) = 2</code></li>
-<li><code>Integer branchTo(min=branchFrom+2,max=n) = 4</code></li>
-</ul>
-<p>接口及方向</p>
-<ul>
-<li><code>Modelica.Blocks.Interfaces.BooleanInput jumpRequested \"Read at the selected boundary\"</code></li>
-<li><code>Modelica.Blocks.Interfaces.IntegerOutput phase \"Scheduled stage, 0 outside active mission\"</code></li>
-<li><code>Modelica.Blocks.Interfaces.BooleanOutput jumped(start=false,fixed=true)</code></li>
-<li><code>Modelica.Blocks.Interfaces.BooleanOutput completed</code></li>
-<li><code>Modelica.Blocks.Interfaces.RealOutput elapsed(unit=\"s\") \"Elapsed time within stage\"</code></li>
-</ul>
-<p><a href=\"modelica://ScenarioLibrary.Examples.MultiphaseMission\">MultiPhaseSystemScenario</a> 提供同域宿主参考。</p>
-</html>"));
+    Documentation(info="<html><p>Build consecutive positive-duration phases from <code>startTime</code>. At the end of <code>branchFrom</code>, sample <code>jumpRequested</code> once. A true decision skips the intervening phases and continues at <code>branchTo</code>, shortening the remaining schedule by their total duration. <code>jumped</code> retains the decision.</p><p><code>phase</code> is zero before the schedule and after completion; otherwise it identifies the current stage. <code>elapsed</code> is local to that stage and returns to zero outside the schedule. If simulation initialisation occurs at or beyond the decision boundary, the request is sampled at initialisation.</p></html>"));
 end BranchingPhaseSchedule;

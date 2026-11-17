@@ -1,15 +1,15 @@
 within ScenarioLibrary.Environment;
-block ScheduledIrradiance "按正常明暗周期和过渡时长输出辐照度"
-  parameter Modelica.Units.SI.Time startTime = 0 "First light transition";
-  parameter Modelica.Units.SI.Time period(min=Modelica.Constants.small) = 120;
-  parameter Modelica.Units.SI.Time lightTime(min=Modelica.Constants.small) = 75;
-  parameter Modelica.Units.SI.Time transitionTime(min=Modelica.Constants.small) = 2;
-  parameter Real fullIrradiance(unit="W/m2",min=0) = 1000;
-  Modelica.Blocks.Interfaces.RealOutput irradiance(unit="W/m2") annotation(Placement(transformation(extent={{94,18},{106,30}}), iconTransformation(extent={{94,18},{106,30}})));
-  Modelica.Blocks.Interfaces.BooleanOutput illuminated annotation(Placement(transformation(extent={{94,-30},{106,-18}}), iconTransformation(extent={{94,-30},{106,-18}})));
+block ScheduledIrradiance "Repeated light intervals with linear irradiance transitions"
+  parameter Modelica.Units.SI.Time startTime = 0 "Start of the first light interval";
+  parameter Modelica.Units.SI.Time period(min=Modelica.Constants.small) = 120 "Positive repetition period";
+  parameter Modelica.Units.SI.Time lightTime(min=Modelica.Constants.small) = 75 "Duration of each light interval";
+  parameter Modelica.Units.SI.Time transitionTime(min=Modelica.Constants.small) = 2 "Positive duration of each irradiance rise or fall";
+  parameter Real fullIrradiance(unit="W/m2",min=0) = 1000 "Nonnegative irradiance reached at full illumination";
+  Modelica.Blocks.Interfaces.RealOutput irradiance(unit="W/m2")  "Scheduled irradiance" annotation(Placement(transformation(extent={{94,18},{106,30}}), iconTransformation(extent={{94,18},{106,30}})));
+  Modelica.Blocks.Interfaces.BooleanOutput illuminated  "True within the scheduled half-open light interval" annotation(Placement(transformation(extent={{94,-30},{106,-18}}), iconTransformation(extent={{94,-30},{106,-18}})));
 protected
-  Modelica.Units.SI.Time localTime;
-  Real weight;
+  Modelica.Units.SI.Time localTime "Time within the repeated illumination cycle";
+  Real weight "Unit irradiance multiplier";
 initial equation
   assert(period>0 and lightTime<=period and transitionTime>0 and 2*transitionTime<=lightTime and fullIrradiance>=0,
     "Invalid illumination schedule.");
@@ -36,24 +36,5 @@ equation
         Text(extent={{-150,155},{150,125}}, textString="%name", textColor={0,0,255}, fontSize=0)
       }),
     Diagram(coordinateSystem(extent={{-100,-100},{100,100}})),
-    Documentation(info="<html><p><b>Purpose</b> 按正常明暗周期和过渡时长输出辐照度</p><p><b>Interfaces</b> Modelica.Blocks.Interfaces.RealOutput irradiance(unit=\"W/m2\"); Modelica.Blocks.Interfaces.BooleanOutput illuminated</p><p><b>Parameters</b> parameter Modelica.Units.SI.Time startTime = 0 \"First light transition\"; parameter Modelica.Units.SI.Time period(min=Modelica.Constants.small) = 120; parameter Modelica.Units.SI.Time lightTime(min=Modelica.Constants.small) = 75; parameter Modelica.Units.SI.Time transitionTime(min=Modelica.Constants.small) = 2; parameter Real fullIrradiance(unit=\"W/m2\",min=0) = 1000</p><p><b>Behavior</b> 按正常明暗周期和过渡时长输出辐照度</p><p><b>Initialization</b> Use the declared initial values and host state modifiers.</p><p><b>Activation and recovery</b> Not applicable.</p><p><b>Limitations</b> Use the declared parameter range. The catalog identifies simulation coverage.</p><p><b>Observables</b> Inspect the declared output variables.</p><p><b>Example</b> <a href=\"modelica://ScenarioLibrary.Examples.EnvironmentalConditions\">ScenarioLibrary.Examples.EnvironmentalConditions</a></p>
-<p>按正常明暗周期和过渡时长输出辐照度</p>
-<p><b>行为</b> 周期内先线性增亮，再平台，后线性减弱，余下为暗。起点前辐照为零。</p>
-<p><b>最小用法</b> 将 irradiance 送到宿主的外部热或光电模型。</p>
-<p><b>适用边界</b> 光照时长由用户直接提供，适用于地面灯源或预先生成的日照时表。</p>
-<p>参数的类型、默认值和取值见下列声明。</p>
-<ul>
-<li><code>Modelica.Units.SI.Time startTime = 0 \"First light transition\"</code></li>
-<li><code>Modelica.Units.SI.Time period(min=Modelica.Constants.small) = 120</code></li>
-<li><code>Modelica.Units.SI.Time lightTime(min=Modelica.Constants.small) = 75</code></li>
-<li><code>Modelica.Units.SI.Time transitionTime(min=Modelica.Constants.small) = 2</code></li>
-<li><code>Real fullIrradiance(unit=\"W/m2\",min=0) = 1000</code></li>
-</ul>
-<p>接口及方向</p>
-<ul>
-<li><code>Modelica.Blocks.Interfaces.RealOutput irradiance(unit=\"W/m2\")</code></li>
-<li><code>Modelica.Blocks.Interfaces.BooleanOutput illuminated</code></li>
-</ul>
-<p><a href=\"modelica://ScenarioLibrary.Examples.MultiphaseMission\">MultiPhaseSystemScenario</a> 提供同域宿主参考。</p>
-</html>"));
+    Documentation(info="<html><p>Repeat a light interval of duration <code>lightTime</code> every <code>period</code>, beginning at <code>startTime</code>. Irradiance rises linearly over <code>transitionTime</code>, holds at <code>fullIrradiance</code> when a plateau is available, and falls linearly over the final transition.</p><p>The light interval must fit within the period and contain both positive-duration transitions. <code>illuminated</code> marks the half-open light interval independently of irradiance magnitude, so it is true at the interval start while irradiance is still zero. Both outputs are inactive before startTime.</p></html>"));
 end ScheduledIrradiance;

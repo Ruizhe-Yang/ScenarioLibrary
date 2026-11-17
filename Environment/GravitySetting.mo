@@ -1,10 +1,10 @@
 within ScenarioLibrary.Environment;
-model GravitySetting "按任务坡度给质量体施加重力切向分量"
-  parameter Modelica.Units.SI.Mass carriedMass(min=0) = 10 "参与重力的质量，kg";
-  parameter Modelica.Units.SI.Acceleration gravity(min=0) = Modelica.Constants.g_n "当地重力幅值，m/s2";
-  Modelica.Blocks.Interfaces.RealInput grade(unit="rad") "正值表示沿运动正向下坡" annotation(Placement(transformation(extent={{-106,-6},{-94,6}}), iconTransformation(extent={{-106,-6},{-94,6}})));
-  Modelica.Mechanics.Translational.Interfaces.Flange_b flange "受载平动部件" annotation(Placement(transformation(extent={{-7,-107},{7,-93}}), iconTransformation(extent={{-7,-107},{7,-93}})));
-  Modelica.Blocks.Interfaces.RealOutput force(unit="N") "施加给部件的切向重力" annotation(Placement(transformation(extent={{94,-6},{106,6}}), iconTransformation(extent={{94,-6},{106,6}})));
+model GravitySetting "Tangential gravitational load for a prescribed grade"
+  parameter Modelica.Units.SI.Mass carriedMass(min=0) = 10 "Mass used to calculate the gravitational load";
+  parameter Modelica.Units.SI.Acceleration gravity(min=0) = Modelica.Constants.g_n "Nonnegative local gravity magnitude";
+  Modelica.Blocks.Interfaces.RealInput grade(unit="rad") "Downhill grade in the positive direction of motion" annotation(Placement(transformation(extent={{-106,-6},{-94,6}}), iconTransformation(extent={{-106,-6},{-94,6}})));
+  Modelica.Mechanics.Translational.Interfaces.Flange_b flange "Translational body connection" annotation(Placement(transformation(extent={{-7,-107},{7,-93}}), iconTransformation(extent={{-7,-107},{7,-93}})));
+  Modelica.Blocks.Interfaces.RealOutput force(unit="N") "Applied tangential gravitational force" annotation(Placement(transformation(extent={{94,-6},{106,6}}), iconTransformation(extent={{94,-6},{106,6}})));
 protected
   Modelica.Mechanics.Translational.Sources.Force load;
 initial equation
@@ -25,22 +25,5 @@ equation
         Text(extent={{-150,155},{150,125}}, textString="%name", textColor={0,0,255}, fontSize=0)
       }),
     Diagram(coordinateSystem(extent={{-100,-100},{100,100}}, preserveAspectRatio=true), graphics={Text(extent={{-96,99},{96,88}}, textColor={30,104,76}, textString="GravitySetting")}),
-    Documentation(info="<html><p><b>Purpose</b> 按任务坡度给质量体施加重力切向分量</p><p><b>Interfaces</b> Modelica.Blocks.Interfaces.RealInput grade(unit=\"rad\") \"正值表示沿运动正向下坡\"; Modelica.Mechanics.Translational.Interfaces.Flange_b flange \"受载平动部件\"; Modelica.Blocks.Interfaces.RealOutput force(unit=\"N\") \"施加给部件的切向重力\"</p><p><b>Parameters</b> parameter Modelica.Units.SI.Mass carriedMass(min=0) = 10 \"参与重力的质量，kg\"; parameter Modelica.Units.SI.Acceleration gravity(min=0) = Modelica.Constants.g_n \"当地重力幅值，m/s2\"</p><p><b>Behavior</b> 按任务坡度给质量体施加重力切向分量</p><p><b>Initialization</b> Use the declared initial values and host state modifiers.</p><p><b>Activation and recovery</b> Not applicable.</p><p><b>Limitations</b> Use the declared parameter range. The catalog identifies simulation coverage.</p><p><b>Observables</b> Inspect the declared output variables.</p><p><b>Example</b> <a href=\"modelica://ScenarioLibrary.Examples.EnvironmentalConditions\">ScenarioLibrary.Examples.EnvironmentalConditions</a></p>
-<p>按任务坡度给质量体施加重力切向分量</p>
-<p>专业分类为 Environment.Mechanical。</p>
-<p>接口与方向</p>
-<ul>
-<li><code>Modelica.Blocks.Interfaces.RealInput grade(unit=\"rad\") \"正值表示沿运动正向下坡\"</code></li>
-<li><code>Modelica.Mechanics.Translational.Interfaces.Flange_b flange \"受载平动部件\"</code></li>
-<li><code>Modelica.Blocks.Interfaces.RealOutput force(unit=\"N\") \"施加给部件的切向重力\"</code></li>
-</ul>
-<p>参数、类型、默认值及约束</p>
-<ul>
-<li><code>Modelica.Units.SI.Mass carriedMass(min=0) = 10 \"参与重力的质量，kg\"</code></li>
-<li><code>Modelica.Units.SI.Acceleration gravity(min=0) = Modelica.Constants.g_n \"当地重力幅值，m/s2\"</code></li>
-</ul>
-<p><b>时序与基准行为</b> 给定坡度即时确定重力分量。水平时作用为零。</p>
-<p><b>最小用法</b> 接到沿坡道运动的 Mass，grade 由计划路径提供。 <a href=\"modelica://ScenarioLibrary.Examples.MultiphaseMission\">MechanicalMissionScenario</a> 展示同域接线。</p>
-<p><b>适用边界</b> 仅表示一维外部重力投影。地面反力和摩擦由宿主设置。</p>
-</html>"));
+    Documentation(info="<html><p>Apply the external force <code>carriedMass*gravity*sin(grade)</code> through a translational force source. Positive grade denotes downhill in the positive direction of motion. The force output reports the applied load command.</p><p>Connect the flange to the loaded body and supply grade in radians within [-pi/2,pi/2]. carriedMass specifies the mass used to calculate gravity; this model does not add that mass to the connected mechanical system.</p></html>"));
 end GravitySetting;

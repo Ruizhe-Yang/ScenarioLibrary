@@ -1,8 +1,8 @@
 within ScenarioLibrary.Timing;
-block PhaseWindow "Qualify one phase of an external schedule"
-parameter Integer targetPhase(min=1)=2;
-    Modelica.Blocks.Interfaces.IntegerInput phaseIndex annotation(Placement(transformation(origin={-100,0},extent={{-10,-10},{10,10}}),iconTransformation(origin={-100,0},extent={{-10,-10},{10,10}})));
-  Modelica.Blocks.Interfaces.BooleanOutput active annotation(Placement(transformation(origin={100,0},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,0},extent={{-10,-10},{10,10}})));
+block PhaseWindow "Boolean qualification of one phase index"
+parameter Integer targetPhase(min=1)=2 "Ordinal phase index to qualify";
+    Modelica.Blocks.Interfaces.IntegerInput phaseIndex  "Supplied ordinal phase index" annotation(Placement(transformation(origin={-100,0},extent={{-10,-10},{10,10}}),iconTransformation(origin={-100,0},extent={{-10,-10},{10,10}})));
+  Modelica.Blocks.Interfaces.BooleanOutput active  "True when phaseIndex equals targetPhase" annotation(Placement(transformation(origin={100,0},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,0},extent={{-10,-10},{10,10}})));
 equation
   active=phaseIndex==targetPhase;
   annotation(Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
@@ -19,5 +19,5 @@ equation
         Text(extent={{-22,69},{22,38}}, textString="=", textColor={75,138,73}, fontSize=0),
         Text(extent={{-150,155},{150,125}}, textString="%name", textColor={0,0,255}, fontSize=0)
       }),
-    Documentation(info="<html><p><b>Purpose</b> Qualify one phase of an external schedule.</p><p><b>Interfaces</b> Modelica.Blocks.Interfaces.IntegerInput phaseIndex; Modelica.Blocks.Interfaces.BooleanOutput active</p><p><b>Parameters</b> parameter Integer targetPhase(min=1)=2</p><p><b>Behavior</b> Qualify one phase of an external schedule</p><p><b>Initialization</b> Evaluated from the current inputs and parameter bindings.</p><p><b>Activation and recovery</b> Not applicable.</p><p><b>Limitations</b> Outputs retain the units declared at the interface. Numerical values depend on the supplied input and parameter range.</p><p><b>Observables</b> active</p><p><b>Example</b> <a href=\"modelica://ScenarioLibrary.Examples.PhaseQualifiedWindows\">ScenarioLibrary.Examples.PhaseQualifiedWindows</a></p></html>"));
+    Documentation(info="<html><p>Set <code>active</code> whenever the supplied <code>phaseIndex</code> equals <code>targetPhase</code>. The block applies no additional time window or state retention.</p></html>"));
 end PhaseWindow;

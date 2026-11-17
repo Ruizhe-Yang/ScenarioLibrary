@@ -1,20 +1,20 @@
 within ScenarioLibrary.Profiles;
-block RepeatingStartupCycle "按启运、保载、停机和休息重复执行正常任务"
-  parameter Integer cycles(min=1) = 3;
-  parameter Modelica.Units.SI.Time startTime = 0;
-  parameter Modelica.Units.SI.Time riseTime(min=Modelica.Constants.small) = 1;
-  parameter Modelica.Units.SI.Time holdTime(min=0) = 2;
-  parameter Modelica.Units.SI.Time fallTime(min=Modelica.Constants.small) = 1;
-  parameter Modelica.Units.SI.Time idleTime(min=0) = 1;
-  parameter Real standby = 0 "Off-task demand";
-  parameter Real rated = 1 "Running demand";
-  final parameter Modelica.Units.SI.Time period = riseTime+holdTime+fallTime+idleTime;
-  Modelica.Blocks.Interfaces.RealOutput y annotation(Placement(transformation(extent={{94,42},{106,54}}), iconTransformation(extent={{94,42},{106,54}})));
-  Modelica.Blocks.Interfaces.IntegerOutput cycle "1-based running cycle or 0" annotation(Placement(transformation(extent={{94,-6},{106,6}}), iconTransformation(extent={{94,-6},{106,6}})));
-  Modelica.Blocks.Interfaces.BooleanOutput completed annotation(Placement(transformation(extent={{94,-54},{106,-42}}), iconTransformation(extent={{94,-54},{106,-42}})));
+block RepeatingStartupCycle "Repeated start-up, hold, shutdown and idle sequence"
+  parameter Integer cycles(min=1) = 3 "Number of scheduled periods";
+  parameter Modelica.Units.SI.Time startTime = 0 "Absolute start of the first period";
+  parameter Modelica.Units.SI.Time riseTime(min=Modelica.Constants.small) = 1 "Positive duration of the linear rise";
+  parameter Modelica.Units.SI.Time holdTime(min=0) = 2 "Duration of the constant rated demand";
+  parameter Modelica.Units.SI.Time fallTime(min=Modelica.Constants.small) = 1 "Positive duration of the linear fall";
+  parameter Modelica.Units.SI.Time idleTime(min=0) = 1 "Standby duration at the end of each period";
+  parameter Real standby = 0 "Demand outside the running portion";
+  parameter Real rated = 1 "Demand during the hold portion";
+  final parameter Modelica.Units.SI.Time period = riseTime+holdTime+fallTime+idleTime "Sum of rise, hold, fall and idle durations";
+  Modelica.Blocks.Interfaces.RealOutput y  "Prescribed output signal" annotation(Placement(transformation(extent={{94,42},{106,54}}), iconTransformation(extent={{94,42},{106,54}})));
+  Modelica.Blocks.Interfaces.IntegerOutput cycle "One-based period index including idle, or zero outside the sequence" annotation(Placement(transformation(extent={{94,-6},{106,6}}), iconTransformation(extent={{94,-6},{106,6}})));
+  Modelica.Blocks.Interfaces.BooleanOutput completed  "The final scheduled period has ended" annotation(Placement(transformation(extent={{94,-54},{106,-42}}), iconTransformation(extent={{94,-54},{106,-42}})));
 protected
-  Modelica.Units.SI.Time localTime;
-  Real fraction;
+  Modelica.Units.SI.Time localTime "Elapsed time within the active period";
+  Real fraction "Normalised demand relative to standby and rated values";
 initial equation
   assert(cycles>=1 and riseTime>0 and holdTime>=0 and fallTime>0 and idleTime>=0,"Invalid startup cycle.");
 equation
@@ -34,29 +34,5 @@ equation
         Text(extent={{-150,155},{150,125}}, textString="%name", textColor={0,0,255}, fontSize=0)
       }),
     Diagram(coordinateSystem(extent={{-100,-100},{100,100}})),
-    Documentation(info="<html><p><b>Purpose</b> 按启运、保载、停机和休息重复执行正常任务</p><p><b>Interfaces</b> Modelica.Blocks.Interfaces.RealOutput y; Modelica.Blocks.Interfaces.IntegerOutput cycle \"1-based running cycle or 0\"; Modelica.Blocks.Interfaces.BooleanOutput completed</p><p><b>Parameters</b> parameter Integer cycles(min=1) = 3; parameter Modelica.Units.SI.Time startTime = 0; parameter Modelica.Units.SI.Time riseTime(min=Modelica.Constants.small) = 1; parameter Modelica.Units.SI.Time holdTime(min=0) = 2; parameter Modelica.Units.SI.Time fallTime(min=Modelica.Constants.small) = 1; parameter Modelica.Units.SI.Time idleTime(min=0) = 1; parameter Real standby = 0 \"Off-task demand\"; parameter Real rated = 1 \"Running demand\"; final parameter Modelica.Units.SI.Time period = riseTime+holdTime+fallTime+idleTime</p><p><b>Behavior</b> 按启运、保载、停机和休息重复执行正常任务</p><p><b>Initialization</b> Use the declared initial values and host state modifiers.</p><p><b>Activation and recovery</b> Not applicable.</p><p><b>Limitations</b> Use the declared parameter range. The catalog identifies simulation coverage.</p><p><b>Observables</b> Inspect the declared output variables.</p><p><b>Example</b> <a href=\"modelica://ScenarioLibrary.Examples.MultiphaseMission\">ScenarioLibrary.Examples.MultiphaseMission</a></p>
-<p>按启运、保载、停机和休息重复执行正常任务</p>
-<p><b>行为</b> 每轮包含四段，连续回到待机值。完成后 cycle=0、completed=true。</p>
-<p><b>最小用法</b> 把 y 接重复启动的负荷、供热或流量参考。</p>
-<p><b>适用边界</b> 零保载和零休息均允许。起落沿需正时长。</p>
-<p>参数的类型、默认值和取值见下列声明。</p>
-<ul>
-<li><code>Integer cycles(min=1) = 3</code></li>
-<li><code>Modelica.Units.SI.Time startTime = 0</code></li>
-<li><code>Modelica.Units.SI.Time riseTime(min=Modelica.Constants.small) = 1</code></li>
-<li><code>Modelica.Units.SI.Time holdTime(min=0) = 2</code></li>
-<li><code>Modelica.Units.SI.Time fallTime(min=Modelica.Constants.small) = 1</code></li>
-<li><code>Modelica.Units.SI.Time idleTime(min=0) = 1</code></li>
-<li><code>Real standby = 0 \"Off-task demand\"</code></li>
-<li><code>Real rated = 1 \"Running demand\"</code></li>
-<li><code>final parameter Modelica.Units.SI.Time period = riseTime+holdTime+fallTime+idleTime</code></li>
-</ul>
-<p>接口及方向</p>
-<ul>
-<li><code>Modelica.Blocks.Interfaces.RealOutput y</code></li>
-<li><code>Modelica.Blocks.Interfaces.IntegerOutput cycle \"1-based running cycle or 0\"</code></li>
-<li><code>Modelica.Blocks.Interfaces.BooleanOutput completed</code></li>
-</ul>
-<p><a href=\"modelica://ScenarioLibrary.Examples.MultiphaseMission\">ThermalCycleScenario</a> 提供同域宿主参考。</p>
-</html>"));
+    Documentation(info="<html><p>Repeat a linear rise from <code>standby</code> to <code>rated</code>, a hold, a linear fall and an idle interval. The period is the sum of these four durations. Timing is absolute and the number of periods is finite.</p><p><code>cycle</code> remains one-based throughout the active period, including its idle part. At <code>startTime+cycles*period</code>, <code>completed</code> becomes true, <code>cycle</code> returns to zero and <code>y</code> remains at standby.</p></html>"));
 end RepeatingStartupCycle;

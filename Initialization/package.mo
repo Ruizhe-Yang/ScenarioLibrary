@@ -1,5 +1,5 @@
 within ScenarioLibrary;
-package Initialization "Initialization"
+package Initialization "Records for explicit initial-state bindings"
   extends Modelica.Icons.Package;
   annotation(Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
       graphics={
@@ -10,4 +10,5 @@ package Initialization "Initialization"
         Line(points={{-4.6,-2.76},{41.4,-2.76}}, color={128,128,128}, thickness=0.7, pattern=LinePattern.Solid),
         Line(points={{-4.6,-24.84},{28.52,-24.84}}, color={128,128,128}, thickness=0.7, pattern=LinePattern.Solid)
       }));
+  annotation(Documentation(info="<html><p>Records hold initial values and initialisation choices for explicit binding to host-model parameters and state modifiers. Declaring a record alone does not add initial equations or reset a simulated state.</p></html>"));
 end Initialization;

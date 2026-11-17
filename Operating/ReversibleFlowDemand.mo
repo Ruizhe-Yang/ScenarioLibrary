@@ -1,12 +1,12 @@
 within ScenarioLibrary.Operating;
-block ReversibleFlowDemand "给出连续起止的正反向周期流量指令"
-  parameter Modelica.Units.SI.Time startTime = 0;
-  parameter Modelica.Units.SI.Time period(min=Modelica.Constants.small) = 2;
-  parameter Integer cycles(min=1) = 2;
-  parameter Modelica.Units.SI.MassFlowRate amplitude(min=0) = 0.02;
-  parameter Modelica.Units.SI.MassFlowRate meanFlow = 0;
-  Modelica.Blocks.Interfaces.RealOutput requestedFlow(unit="kg/s") annotation(Placement(transformation(extent={{94,18},{106,30}}), iconTransformation(extent={{94,18},{106,30}})));
-  Modelica.Blocks.Interfaces.BooleanOutput running annotation(Placement(transformation(extent={{94,-30},{106,-18}}), iconTransformation(extent={{94,-30},{106,-18}})));
+block ReversibleFlowDemand "Finite sinusoidal mass-flow demand about a mean value"
+  parameter Modelica.Units.SI.Time startTime = 0 "Absolute start of the sinusoidal sequence";
+  parameter Modelica.Units.SI.Time period(min=Modelica.Constants.small) = 2 "Positive repetition period";
+  parameter Integer cycles(min=1) = 2 "Number of scheduled periods";
+  parameter Modelica.Units.SI.MassFlowRate amplitude(min=0) = 0.02 "Nonnegative oscillating mass-flow amplitude";
+  parameter Modelica.Units.SI.MassFlowRate meanFlow = 0 "Mean flow and output outside the sequence";
+  Modelica.Blocks.Interfaces.RealOutput requestedFlow(unit="kg/s")  "Prescribed signed mass-flow demand" annotation(Placement(transformation(extent={{94,18},{106,30}}), iconTransformation(extent={{94,18},{106,30}})));
+  Modelica.Blocks.Interfaces.BooleanOutput running  "The finite sinusoidal sequence is active" annotation(Placement(transformation(extent={{94,-30},{106,-18}}), iconTransformation(extent={{94,-30},{106,-18}})));
 initial equation
   assert(period>0 and cycles>=1 and amplitude>=0,"Invalid flow demand settings.");
 equation
@@ -22,24 +22,5 @@ equation
         Text(extent={{-150,155},{150,125}}, textString="%name", textColor={0,0,255}, fontSize=0)
       }),
     Diagram(coordinateSystem(extent={{-100,-100},{100,100}})),
-    Documentation(info="<html><p><b>Purpose</b> 给出连续起止的正反向周期流量指令</p><p><b>Interfaces</b> Modelica.Blocks.Interfaces.RealOutput requestedFlow(unit=\"kg/s\"); Modelica.Blocks.Interfaces.BooleanOutput running</p><p><b>Parameters</b> parameter Modelica.Units.SI.Time startTime = 0; parameter Modelica.Units.SI.Time period(min=Modelica.Constants.small) = 2; parameter Integer cycles(min=1) = 2; parameter Modelica.Units.SI.MassFlowRate amplitude(min=0) = 0.02; parameter Modelica.Units.SI.MassFlowRate meanFlow = 0</p><p><b>Behavior</b> 给出连续起止的正反向周期流量指令</p><p><b>Initialization</b> Use the declared initial values and host state modifiers.</p><p><b>Activation and recovery</b> Not applicable.</p><p><b>Limitations</b> Use the declared parameter range. The catalog identifies simulation coverage.</p><p><b>Observables</b> Inspect the declared output variables.</p><p><b>Example</b> <a href=\"modelica://ScenarioLibrary.Examples.LoadAndCommandSchedules\">ScenarioLibrary.Examples.LoadAndCommandSchedules</a></p>
-<p>给出连续起止的正反向周期流量指令</p>
-<p><b>行为</b> 在有限个整周期内围绕 meanFlow 正弦变化，窗外为平均流量。</p>
-<p><b>最小用法</b> 将其接容许双向流动的供流控制。若需要逆向阶段，幅值需超过平均值绝对值。</p>
-<p><b>适用边界</b> 输出是需求。允许流向和介质能量由宿主决定。</p>
-<p>参数的类型、默认值和取值见下列声明。</p>
-<ul>
-<li><code>Modelica.Units.SI.Time startTime = 0</code></li>
-<li><code>Modelica.Units.SI.Time period(min=Modelica.Constants.small) = 2</code></li>
-<li><code>Integer cycles(min=1) = 2</code></li>
-<li><code>Modelica.Units.SI.MassFlowRate amplitude(min=0) = 0.02</code></li>
-<li><code>Modelica.Units.SI.MassFlowRate meanFlow = 0</code></li>
-</ul>
-<p>接口及方向</p>
-<ul>
-<li><code>Modelica.Blocks.Interfaces.RealOutput requestedFlow(unit=\"kg/s\")</code></li>
-<li><code>Modelica.Blocks.Interfaces.BooleanOutput running</code></li>
-</ul>
-<p><a href=\"modelica://ScenarioLibrary.Examples.MultiphaseMission\">FluidOperatingScenario</a> 提供同域宿主参考。</p>
-</html>"));
+    Documentation(info="<html><p>Add a sinusoid of the configured amplitude to <code>meanFlow</code> during <code>cycles</code> complete periods from <code>startTime</code>. Outside the half-open sequence, the requested flow equals <code>meanFlow</code>.</p><p>The value is continuous at the sequence boundaries, although its slope may jump. <code>running</code> identifies the scheduled interval. Flow reverses only when the chosen mean and amplitude make the command cross zero.</p></html>"));
 end ReversibleFlowDemand;

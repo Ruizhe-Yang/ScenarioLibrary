@@ -1,5 +1,5 @@
 within ScenarioLibrary.Utilities.Types;
-type OperatingMode = enumeration(Off "停机", Standby "待机", Startup "启动", Rated "额定", PartLoad "部分负载", Shutdown "停机过程", Maintenance "维护") "计划工况的具名状态"
+type OperatingMode = enumeration(Off "Stopped", Standby "Ready without active operation", Startup "Starting operation", Rated "Rated operation", PartLoad "Part-load operation", Shutdown "Stopping operation", Maintenance "Maintenance condition") "Named planned operating conditions"
   annotation(Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
       graphics={
         Rectangle(extent={{-85,-85},{85,85}}, lineColor={128,128,128}, fillColor={160,160,164}, fillPattern=FillPattern.Solid, pattern=LinePattern.Solid, lineThickness=0.5, radius=18),
@@ -8,6 +8,4 @@ type OperatingMode = enumeration(Off "停机", Standby "待机", Startup "启动
         Line(points={{-4,-55},{-4,3}}, color={255,255,255}, thickness=2, pattern=LinePattern.Solid),
         Line(points={{35,-55},{35,36}}, color={255,255,255}, thickness=2, pattern=LinePattern.Solid)
       }),
-    Documentation(info="<html>
-<p>表示场景预定工况。</p>
-</html>"));
+    Documentation(info="<html><p>Enumerate planned operating conditions: Off, Standby, Startup, Rated, PartLoad, Shutdown and Maintenance. These labels describe a selected condition; they do not assess whether the physical system has reached it.</p></html>"));

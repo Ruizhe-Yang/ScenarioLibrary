@@ -1,11 +1,11 @@
 within ScenarioLibrary.Environment;
-block Inclination "Resolved gravity for an upward positive slope coordinate"
-parameter Modelica.Units.SI.Angle alpha=0;
-  parameter Modelica.Units.SI.Acceleration g(min=0)=Modelica.Constants.g_n;
-    Modelica.Blocks.Interfaces.RealOutput sinAlpha annotation(Placement(transformation(origin={100,70},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,70},extent={{-10,-10},{10,10}})));
-  Modelica.Blocks.Interfaces.RealOutput cosAlpha annotation(Placement(transformation(origin={100,23.33333},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,23.33333},extent={{-10,-10},{10,10}})));
-  Modelica.Blocks.Interfaces.RealOutput alongSlope(unit="m/s2") annotation(Placement(transformation(origin={100,-23.33333},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,-23.33333},extent={{-10,-10},{10,10}})));
-  Modelica.Blocks.Interfaces.RealOutput normal(unit="m/s2") annotation(Placement(transformation(origin={100,-70},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,-70},extent={{-10,-10},{10,10}})));
+block Inclination "Gravity components for an upward-positive slope"
+parameter Modelica.Units.SI.Angle alpha=0 "Slope angle for the upward-positive tangent";
+  parameter Modelica.Units.SI.Acceleration g(min=0)=Modelica.Constants.g_n "Nonnegative gravity magnitude";
+    Modelica.Blocks.Interfaces.RealOutput sinAlpha  "Sine of the prescribed slope angle" annotation(Placement(transformation(origin={100,70},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,70},extent={{-10,-10},{10,10}})));
+  Modelica.Blocks.Interfaces.RealOutput cosAlpha  "Cosine of the prescribed slope angle" annotation(Placement(transformation(origin={100,23.33333},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,23.33333},extent={{-10,-10},{10,10}})));
+  Modelica.Blocks.Interfaces.RealOutput alongSlope(unit="m/s2")  "Gravity acceleration along the upward-positive tangent" annotation(Placement(transformation(origin={100,-23.33333},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,-23.33333},extent={{-10,-10},{10,10}})));
+  Modelica.Blocks.Interfaces.RealOutput normal(unit="m/s2")  "Gravity acceleration along the outward-positive normal" annotation(Placement(transformation(origin={100,-70},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,-70},extent={{-10,-10},{10,10}})));
 equation
   sinAlpha=sin(alpha);
   cosAlpha=cos(alpha);
@@ -21,5 +21,5 @@ equation
         Text(extent={{26,65},{57,37}}, textString="g", textColor={64,64,64}, fontSize=0),
         Text(extent={{-150,155},{150,125}}, textString="%name", textColor={0,0,255}, fontSize=0)
       }),
-    Documentation(info="<html><p><b>Purpose</b> Resolved gravity for an upward positive slope coordinate.</p><p><b>Interfaces</b> Modelica.Blocks.Interfaces.RealOutput sinAlpha; Modelica.Blocks.Interfaces.RealOutput cosAlpha; Modelica.Blocks.Interfaces.RealOutput alongSlope(unit=\"m/s2\"); Modelica.Blocks.Interfaces.RealOutput normal(unit=\"m/s2\")</p><p><b>Parameters</b> parameter Modelica.Units.SI.Angle alpha=0; parameter Modelica.Units.SI.Acceleration g(min=0)=Modelica.Constants.g_n</p><p><b>Behavior</b> Resolved gravity for an upward positive slope coordinate</p><p><b>Initialization</b> Evaluated from the current inputs and parameter bindings.</p><p><b>Activation and recovery</b> Not applicable.</p><p><b>Limitations</b> The positive along-slope axis points uphill and the positive normal points away from the slope.</p><p><b>Observables</b> sinAlpha, cosAlpha, alongSlope, normal</p><p><b>Example</b> <a href=\"modelica://ScenarioLibrary.Examples.EnvironmentalConditions\">ScenarioLibrary.Examples.EnvironmentalConditions</a></p></html>"));
+    Documentation(info="<html><p>Resolve gravity for the prescribed angle <code>alpha</code>. Outputs are <code>sin(alpha)</code>, <code>cos(alpha)</code>, <code>alongSlope=-g*sin(alpha)</code> and <code>normal=-g*cos(alpha)</code>.</p><p>The positive tangent points uphill and the positive normal points away from the supporting surface. These are acceleration signals; connect them consistently with the receiving coordinate convention.</p></html>"));
 end Inclination;

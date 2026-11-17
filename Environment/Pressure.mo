@@ -1,9 +1,9 @@
 within ScenarioLibrary.Environment;
-block Pressure "Planned pressure profile"
-parameter Integer n(min=1)=2;
-  parameter Modelica.Units.SI.Time times[n]=linspace(0,1,n);
-  parameter Modelica.Units.SI.AbsolutePressure values[n]=fill(101325,n);
-  Modelica.Blocks.Interfaces.RealOutput y(unit="Pa") annotation(Placement(transformation(origin={100,0},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,0},extent={{-10,-10},{10,10}})));
+block Pressure "Piecewise linear absolute-pressure schedule"
+parameter Integer n(min=1)=2 "Number of pressure schedule points";
+  parameter Modelica.Units.SI.Time times[n]=linspace(0,1,n) "Strictly increasing simulation times";
+  parameter Modelica.Units.SI.AbsolutePressure values[n]=fill(101325,n) "Positive absolute-pressure values at the scheduled times";
+  Modelica.Blocks.Interfaces.RealOutput y(unit="Pa")  "Scheduled absolute pressure" annotation(Placement(transformation(origin={100,0},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,0},extent={{-10,-10},{10,10}})));
 protected
   ScenarioLibrary.Profiles.PiecewiseLinear profile(n=n,times=times,values=values);
 initial equation
@@ -18,5 +18,5 @@ equation
         Text(extent={{-58,73},{66,48}}, textString="p(t)", textColor={64,64,64}, fontSize=0),
         Text(extent={{-150,155},{150,125}}, textString="%name", textColor={0,0,255}, fontSize=0)
       }),
-    Documentation(info="<html><p><b>Purpose</b> Planned pressure profile.</p><p><b>Interfaces</b> Modelica.Blocks.Interfaces.RealOutput y(unit=\"Pa\")</p><p><b>Parameters</b> parameter Integer n(min=1)=2; parameter Modelica.Units.SI.Time times[n]=linspace(0,1,n); parameter Modelica.Units.SI.AbsolutePressure values[n]=fill(101325,n)</p><p><b>Behavior</b> Planned pressure profile</p><p><b>Initialization</b> The declared start values and initialization equations apply.</p><p><b>Activation and recovery</b> Not applicable.</p><p><b>Limitations</b> Outputs retain the units declared at the interface. Numerical values depend on the supplied input and parameter range.</p><p><b>Observables</b> y</p><p><b>Example</b> <a href=\"modelica://ScenarioLibrary.Examples.EnvironmentalConditions\">ScenarioLibrary.Examples.EnvironmentalConditions</a></p></html>"));
+    Documentation(info="<html><p>Interpolate the positive absolute-pressure values at the specified simulation times. Values before the first point and after the last point are held at the corresponding endpoints; a one-point table gives a constant output.</p><p>Use strictly increasing times and connect <code>y</code> to a compatible pressure-signal input. The block defines a signal schedule and has no physical fluid connector.</p></html>"));
 end Pressure;

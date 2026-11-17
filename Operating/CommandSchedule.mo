@@ -1,12 +1,12 @@
 within ScenarioLibrary.Operating;
-block CommandSchedule "Right-continuous planned boolean schedule"
-parameter Integer n(min=1)=2;
-  parameter Modelica.Units.SI.Time times[n]=linspace(0,1,n);
-  parameter Boolean values[n]=fill(false,n);
-  parameter Boolean baseline=false;
-  Modelica.Blocks.Interfaces.BooleanOutput y annotation(Placement(transformation(origin={100,0},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,0},extent={{-10,-10},{10,10}})));
+block CommandSchedule "Right-continuous Boolean command schedule"
+parameter Integer n(min=1)=2 "Number of table nodes";
+  parameter Modelica.Units.SI.Time times[n]=linspace(0,1,n) "Strictly increasing table times";
+  parameter Boolean values[n]=fill(false,n) "Values at the table nodes";
+  parameter Boolean baseline=false "Boolean output before the first table time";
+  Modelica.Blocks.Interfaces.BooleanOutput y  "Scheduled Boolean command" annotation(Placement(transformation(origin={100,0},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,0},extent={{-10,-10},{10,10}})));
 protected
-  Integer i;
+  Integer i "Index of the most recent table node";
 initial equation
   assert(n>=1,"Empty time table.");
   for i in 2:n loop assert(times[i]>times[i-1],"Times must be strictly increasing."); end for;
@@ -21,5 +21,5 @@ equation
         Text(extent={{-42,76},{58,51}}, textString="B(t)", textColor={128,0,128}, fontSize=0),
         Text(extent={{-150,155},{150,125}}, textString="%name", textColor={0,0,255}, fontSize=0)
       }),
-    Documentation(info="<html><p><b>Purpose</b> Right-continuous planned boolean schedule.</p><p><b>Interfaces</b> Modelica.Blocks.Interfaces.BooleanOutput y</p><p><b>Parameters</b> parameter Integer n(min=1)=2; parameter Modelica.Units.SI.Time times[n]=linspace(0,1,n); parameter Boolean values[n]=fill(false,n); parameter Boolean baseline=false</p><p><b>Behavior</b> Right-continuous planned boolean schedule</p><p><b>Initialization</b> The declared start values and initialization equations apply.</p><p><b>Activation and recovery</b> Not applicable.</p><p><b>Limitations</b> Outputs retain the units declared at the interface. Numerical values depend on the supplied input and parameter range.</p><p><b>Observables</b> y</p><p><b>Example</b> <a href=\"modelica://ScenarioLibrary.Examples.LoadAndCommandSchedules\">ScenarioLibrary.Examples.LoadAndCommandSchedules</a></p></html>"));
+    Documentation(info="<html><p>Output <code>baseline</code> before the first strictly increasing table time. At each <code>times[i]</code>, select <code>values[i]</code>. The last Boolean value is held after the final node.</p><p>The schedule uses absolute simulation time and supplies a command; it does not confirm that the receiving component has acted.</p></html>"));
 end CommandSchedule;

@@ -1,15 +1,15 @@
 within ScenarioLibrary.Operating;
-block ValveOpeningProfile "按时段平滑开阀、运行与关阀"
-  parameter Modelica.Units.SI.Time openAt = 1 "开始打开，s";
-  parameter Modelica.Units.SI.Time closeAt = 6 "开始关闭，s";
-  parameter Modelica.Units.SI.Time openingTime(min=Modelica.Constants.small) = 1 "打开过渡时间，s";
-  parameter Modelica.Units.SI.Time closingTime(min=Modelica.Constants.small) = 1.5 "关闭过渡时间，s";
-  parameter Real standbyOpening(min=0,max=1) = 0.05 "待机开度";
-  parameter Real operatingOpening(min=0,max=1) = 0.85 "运行开度";
-  Modelica.Blocks.Interfaces.RealOutput opening(min=0,max=1) "任务指令开度" annotation(Placement(transformation(extent={{94,-6},{106,6}}), iconTransformation(extent={{94,-6},{106,6}})));
+block ValveOpeningProfile "Cubic opening and closing commands between two settings"
+  parameter Modelica.Units.SI.Time openAt = 1 "Absolute start of the opening transition";
+  parameter Modelica.Units.SI.Time closeAt = 6 "Absolute start of the closing transition";
+  parameter Modelica.Units.SI.Time openingTime(min=Modelica.Constants.small) = 1 "Positive duration of the opening transition";
+  parameter Modelica.Units.SI.Time closingTime(min=Modelica.Constants.small) = 1.5 "Positive duration of the closing transition";
+  parameter Real standbyOpening(min=0,max=1) = 0.05 "Opening before the sequence and after closing";
+  parameter Real operatingOpening(min=0,max=1) = 0.85 "Opening between the transitions";
+  Modelica.Blocks.Interfaces.RealOutput opening(min=0,max=1) "Prescribed valve-opening fraction" annotation(Placement(transformation(extent={{94,-6},{106,6}}), iconTransformation(extent={{94,-6},{106,6}})));
 protected
-  Real up;
-  Real down;
+  Real up "Normalised progress of the opening transition";
+  Real down "Normalised progress of the closing transition";
 initial equation
   assert(openingTime > 0 and closingTime > 0 and closeAt >= openAt+openingTime and
     standbyOpening >= 0 and standbyOpening <= 1 and operatingOpening >= 0 and operatingOpening <= 1, "Invalid opening schedule.");
@@ -29,24 +29,5 @@ equation
         Text(extent={{-150,155},{150,125}}, textString="%name", textColor={0,0,255}, fontSize=0)
       }),
     Diagram(coordinateSystem(extent={{-100,-100},{100,100}}, preserveAspectRatio=true), graphics={Text(extent={{-96,99},{96,88}}, textColor={30,104,76}, textString="ValveOpeningProfile")}),
-    Documentation(info="<html><p><b>Purpose</b> 按时段平滑开阀、运行与关阀</p><p><b>Interfaces</b> Modelica.Blocks.Interfaces.RealOutput opening(min=0,max=1) \"任务指令开度\"</p><p><b>Parameters</b> parameter Modelica.Units.SI.Time openAt = 1 \"开始打开，s\"; parameter Modelica.Units.SI.Time closeAt = 6 \"开始关闭，s\"; parameter Modelica.Units.SI.Time openingTime(min=Modelica.Constants.small) = 1 \"打开过渡时间，s\"; parameter Modelica.Units.SI.Time closingTime(min=Modelica.Constants.small) = 1.5 \"关闭过渡时间，s\"; parameter Real standbyOpening(min=0,max=1) = 0.05 \"待机开度\"; parameter Real operatingOpening(min=0,max=1) = 0.85 \"运行开度\"</p><p><b>Behavior</b> 按时段平滑开阀、运行与关阀</p><p><b>Initialization</b> Use the declared initial values and host state modifiers.</p><p><b>Activation and recovery</b> Not applicable.</p><p><b>Limitations</b> Use the declared parameter range. The catalog identifies simulation coverage.</p><p><b>Observables</b> Inspect the declared output variables.</p><p><b>Example</b> <a href=\"modelica://ScenarioLibrary.Examples.LoadAndCommandSchedules\">ScenarioLibrary.Examples.LoadAndCommandSchedules</a></p>
-<p>按时段平滑开阀、运行与关阀</p>
-<p>专业分类为 ExternalInputs.Flow。</p>
-<p>接口与方向</p>
-<ul>
-<li><code>Modelica.Blocks.Interfaces.RealOutput opening(min=0,max=1) \"任务指令开度\"</code></li>
-</ul>
-<p>参数、类型、默认值及约束</p>
-<ul>
-<li><code>Modelica.Units.SI.Time openAt = 1 \"开始打开，s\"</code></li>
-<li><code>Modelica.Units.SI.Time closeAt = 6 \"开始关闭，s\"</code></li>
-<li><code>Modelica.Units.SI.Time openingTime(min=Modelica.Constants.small) = 1 \"打开过渡时间，s\"</code></li>
-<li><code>Modelica.Units.SI.Time closingTime(min=Modelica.Constants.small) = 1.5 \"关闭过渡时间，s\"</code></li>
-<li><code>Real standbyOpening(min=0,max=1) = 0.05 \"待机开度\"</code></li>
-<li><code>Real operatingOpening(min=0,max=1) = 0.85 \"运行开度\"</code></li>
-</ul>
-<p><b>时序与基准行为</b> 过渡为三次平滑曲线。两个过渡不重叠，端点斜率均为零。</p>
-<p><b>最小用法</b> 直接接 ValveLinear.opening，或作为真实执行器的计划目标。 <a href=\"modelica://ScenarioLibrary.Examples.MultiphaseMission\">FluidOperatingScenario</a> 展示同域接线。</p>
-<p><b>适用边界</b> 输出定义为命令开度。质量流量仍由阀特性和实际压差决定。</p>
-</html>"));
+    Documentation(info="<html><p>Move from <code>standbyOpening</code> to <code>operatingOpening</code> using a cubic transition from <code>openAt</code>. Return using a second cubic transition from <code>closeAt</code>. Each transition has zero slope at its endpoints.</p><p>Both openings must lie in [0,1], both transition durations must be positive, and closing may not begin before the opening transition ends. The output remains within the two configured values.</p></html>"));
 end ValveOpeningProfile;

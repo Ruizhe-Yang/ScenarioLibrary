@@ -1,14 +1,14 @@
 within ScenarioLibrary.Timing;
-block PhaseSchedule "Ordered absolute phase schedule with an explicit completed state"
-parameter Integer n(min=1)=2;
-  parameter Modelica.Units.SI.Time boundaries[n+1]=linspace(0,n,n+1);
-  parameter Integer phaseIds[n]={i for i in 1:n};
-    Modelica.Blocks.Interfaces.IntegerOutput phaseIndex annotation(Placement(transformation(origin={100,70},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,70},extent={{-10,-10},{10,10}})));
-  Modelica.Blocks.Interfaces.IntegerOutput phaseId annotation(Placement(transformation(origin={100,23.33333},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,23.33333},extent={{-10,-10},{10,10}})));
-  Modelica.Blocks.Interfaces.RealOutput localTime(unit="s") annotation(Placement(transformation(origin={100,-23.33333},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,-23.33333},extent={{-10,-10},{10,10}})));
-  Modelica.Blocks.Interfaces.BooleanOutput completed annotation(Placement(transformation(origin={100,-70},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,-70},extent={{-10,-10},{10,10}})));
+block PhaseSchedule "Absolute phase boundaries with explicit completion"
+parameter Integer n(min=1)=2 "Number of scheduled phases";
+  parameter Modelica.Units.SI.Time boundaries[n+1]=linspace(0,n,n+1) "Strictly increasing phase start and end boundaries";
+  parameter Integer phaseIds[n]={i for i in 1:n} "Identifiers corresponding to ordinal phase indices";
+    Modelica.Blocks.Interfaces.IntegerOutput phaseIndex  "Ordinal phase index, with zero outside the schedule" annotation(Placement(transformation(origin={100,70},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,70},extent={{-10,-10},{10,10}})));
+  Modelica.Blocks.Interfaces.IntegerOutput phaseId  "Configured identifier of the active phase" annotation(Placement(transformation(origin={100,23.33333},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,23.33333},extent={{-10,-10},{10,10}})));
+  Modelica.Blocks.Interfaces.RealOutput localTime(unit="s")  "Elapsed time since the active phase began" annotation(Placement(transformation(origin={100,-23.33333},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,-23.33333},extent={{-10,-10},{10,10}})));
+  Modelica.Blocks.Interfaces.BooleanOutput completed  "True once the scheduled end has been reached" annotation(Placement(transformation(origin={100,-70},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,-70},extent={{-10,-10},{10,10}})));
 protected
-  Integer i;
+  Integer i "Index of the latest reached boundary";
 initial equation
   for k in 2:n+1 loop assert(boundaries[k]>boundaries[k-1],"Phase boundaries must increase."); end for;
 equation
@@ -31,5 +31,5 @@ equation
         Line(points={{41.5,52},{47.2,46},{58.3,60.4}}, color={75,138,73}, thickness=1.5, pattern=LinePattern.Solid),
         Text(extent={{-150,155},{150,125}}, textString="%name", textColor={0,0,255}, fontSize=0)
       }),
-    Documentation(info="<html><p><b>Purpose</b> Ordered absolute phase schedule with an explicit completed state.</p><p><b>Interfaces</b> Modelica.Blocks.Interfaces.IntegerOutput phaseIndex; Modelica.Blocks.Interfaces.IntegerOutput phaseId; Modelica.Blocks.Interfaces.RealOutput localTime(unit=\"s\"); Modelica.Blocks.Interfaces.BooleanOutput completed</p><p><b>Parameters</b> parameter Integer n(min=1)=2; parameter Modelica.Units.SI.Time boundaries[n+1]=linspace(0,n,n+1); parameter Integer phaseIds[n]={i for i in 1:n}</p><p><b>Behavior</b> Ordered absolute phase schedule with an explicit completed state</p><p><b>Initialization</b> The declared start values and initialization equations apply.</p><p><b>Activation and recovery</b> Not applicable.</p><p><b>Limitations</b> Outputs retain the units declared at the interface. Numerical values depend on the supplied input and parameter range.</p><p><b>Observables</b> phaseIndex, phaseId, localTime, completed</p><p><b>Example</b> <a href=\"modelica://ScenarioLibrary.Examples.PhaseQualifiedWindows\">ScenarioLibrary.Examples.PhaseQualifiedWindows</a></p></html>"));
+    Documentation(info="<html><p>Use strictly increasing <code>boundaries</code> to define phases <code>[boundaries[i],boundaries[i+1])</code>. <code>phaseIndex</code> is the ordinal index and <code>phaseId</code> is its configured label from <code>phaseIds</code>. <code>localTime</code> measures time from the current phase start.</p><p>Before the first boundary, all three outputs are zero. At the last boundary, <code>completed</code> becomes true and the phase index, identifier and local time return to zero. Intermediate boundaries select the phase that starts at that instant.</p></html>"));
 end PhaseSchedule;

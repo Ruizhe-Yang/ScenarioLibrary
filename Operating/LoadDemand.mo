@@ -1,16 +1,16 @@
 within ScenarioLibrary.Operating;
-block LoadDemand "Bounded planned load demand"
-parameter Integer n(min=1)=2;
-  parameter Modelica.Units.SI.Time times[n]=linspace(0,1,n);
-  parameter Real values[n]=linspace(0,1,n);
-  parameter String unitText="1";
-  parameter Real lower=0;
-  parameter Real upper=1;
-  parameter ScenarioLibrary.Utilities.Types.ProfileInterpolation method=ScenarioLibrary.Utilities.Types.ProfileInterpolation.Linear;
-  Modelica.Blocks.Interfaces.RealOutput y annotation(Placement(transformation(origin={100,0},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,0},extent={{-10,-10},{10,10}})));
+block LoadDemand "Range-checked load table with selectable interpolation"
+parameter Integer n(min=1)=2 "Number of table nodes";
+  parameter Modelica.Units.SI.Time times[n]=linspace(0,1,n) "Strictly increasing table times";
+  parameter Real values[n]=linspace(0,1,n) "Values at the table nodes";
+  parameter String unitText="1" "Descriptive signal unit; no unit conversion is performed";
+  parameter Real lower=0 "Lower accepted table value";
+  parameter Real upper=1 "Upper accepted table value";
+  parameter ScenarioLibrary.Utilities.Types.ProfileInterpolation method=ScenarioLibrary.Utilities.Types.ProfileInterpolation.Linear "Interpolation rule for the planned load";
+  Modelica.Blocks.Interfaces.RealOutput y  "Planned load in the intended signal unit" annotation(Placement(transformation(origin={100,0},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,0},extent={{-10,-10},{10,10}})));
 protected
-  ScenarioLibrary.Profiles.PiecewiseLinear lin(n=n,times=times,values=values);
-  ScenarioLibrary.Profiles.PiecewiseConstant hold(n=n,times=times,values=values,baseline=values[1]);
+  ScenarioLibrary.Profiles.PiecewiseLinear lin(n=n,times=times,values=values) "Linearly interpolated load path";
+  ScenarioLibrary.Profiles.PiecewiseConstant hold(n=n,times=times,values=values,baseline=values[1]) "Right-continuous held load path";
 initial equation
   assert(lower<=upper and min(values)>=lower and max(values)<=upper,"Load outside declared range.");
 equation
@@ -24,5 +24,5 @@ equation
         Line(points={{-57,-17},{-29,17},{5,17},{26,-9},{59,31}}, color={0,0,127}, thickness=1.2, pattern=LinePattern.Solid),
         Text(extent={{-150,155},{150,125}}, textString="%name", textColor={0,0,255}, fontSize=0)
       }),
-    Documentation(info="<html><p><b>Purpose</b> Bounded planned load demand.</p><p><b>Interfaces</b> Modelica.Blocks.Interfaces.RealOutput y</p><p><b>Parameters</b> parameter Integer n(min=1)=2; parameter Modelica.Units.SI.Time times[n]=linspace(0,1,n); parameter Real values[n]=linspace(0,1,n); parameter String unitText=\"1\"; parameter Real lower=0; parameter Real upper=1; parameter ScenarioLibrary.Utilities.Types.ProfileInterpolation method=ScenarioLibrary.Utilities.Types.ProfileInterpolation.Linear</p><p><b>Behavior</b> Bounded planned load demand</p><p><b>Initialization</b> The declared start values and initialization equations apply.</p><p><b>Activation and recovery</b> Not applicable.</p><p><b>Limitations</b> Outputs retain the units declared at the interface. Numerical values depend on the supplied input and parameter range.</p><p><b>Observables</b> y</p><p><b>Example</b> <a href=\"modelica://ScenarioLibrary.Examples.LoadAndCommandSchedules\">ScenarioLibrary.Examples.LoadAndCommandSchedules</a></p></html>"));
+    Documentation(info="<html><p>Select linear interpolation or right-continuous holding of <code>values</code> at the given <code>times</code>. Both choices hold the first value before the table and the last value afterwards. Timing is absolute.</p><p>Initial assertions check that every table value lies between <code>lower</code> and <code>upper</code>. These parameters validate the table rather than clip the output. <code>unitText</code> is descriptive metadata and does not assign or convert a connector unit.</p></html>"));
 end LoadDemand;

@@ -1,5 +1,5 @@
 within ScenarioLibrary;
-package Utilities "Utilities"
+package Utilities "Shared scenario functions, types and views"
   extends Modelica.Icons.Package;
   annotation(Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
       graphics={
@@ -7,4 +7,5 @@ package Utilities "Utilities"
         Ellipse(extent={{14.72,23},{59.8,68.08}}, lineColor={128,128,128}, fillColor={255,255,255}, fillPattern=FillPattern.Solid, pattern=LinePattern.Solid, lineThickness=1.2),
         Rectangle(extent={{-60.72,-55.2},{-34.96,-29.44}}, lineColor={64,64,64}, fillColor={235,235,235}, fillPattern=FillPattern.Solid, pattern=LinePattern.Solid, lineThickness=0.5, radius=0)
       }));
+  annotation(Documentation(info="<html><p>Table functions, enumerations and compact signal views used by the scenario components and examples.</p></html>"));
 end Utilities;

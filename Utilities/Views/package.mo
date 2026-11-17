@@ -1,5 +1,5 @@
 within ScenarioLibrary.Utilities;
-package Views "Views"
+package Views "Compact views of planned scenario signals"
   extends Modelica.Icons.Package;
   annotation(Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
       graphics={
@@ -10,4 +10,5 @@ package Views "Views"
         Line(points={{-4.6,-2.76},{41.4,-2.76}}, color={128,128,128}, thickness=0.7, pattern=LinePattern.Solid),
         Line(points={{-4.6,-24.84},{28.52,-24.84}}, color={128,128,128}, thickness=0.7, pattern=LinePattern.Solid)
       }));
+  annotation(Documentation(info="<html><p>Signal views used to expose planned quantities in example models.</p></html>"));
 end Views;

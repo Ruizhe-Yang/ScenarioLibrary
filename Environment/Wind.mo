@@ -1,11 +1,11 @@
 within ScenarioLibrary.Environment;
-block Wind "Three planned wind velocity profiles"
-parameter Integer n(min=1)=2;
-  parameter Modelica.Units.SI.Time times[n]=linspace(0,1,n);
-  parameter Modelica.Units.SI.Velocity values[n,3]=fill(0,n,3);
-    Modelica.Blocks.Interfaces.RealOutput vx(unit="m/s") annotation(Placement(transformation(origin={100,70},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,70},extent={{-10,-10},{10,10}})));
-  Modelica.Blocks.Interfaces.RealOutput vy(unit="m/s") annotation(Placement(transformation(origin={100,0},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,0},extent={{-10,-10},{10,10}})));
-  Modelica.Blocks.Interfaces.RealOutput vz(unit="m/s") annotation(Placement(transformation(origin={100,-70},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,-70},extent={{-10,-10},{10,10}})));
+block Wind "Three-component piecewise linear wind schedule"
+parameter Integer n(min=1)=2 "Number of wind schedule points";
+  parameter Modelica.Units.SI.Time times[n]=linspace(0,1,n) "Strictly increasing simulation times";
+  parameter Modelica.Units.SI.Velocity values[n,3]=fill(0,n,3) "Wind velocity components in the three table columns";
+    Modelica.Blocks.Interfaces.RealOutput vx(unit="m/s")  "First wind velocity component" annotation(Placement(transformation(origin={100,70},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,70},extent={{-10,-10},{10,10}})));
+  Modelica.Blocks.Interfaces.RealOutput vy(unit="m/s")  "Second wind velocity component" annotation(Placement(transformation(origin={100,0},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,0},extent={{-10,-10},{10,10}})));
+  Modelica.Blocks.Interfaces.RealOutput vz(unit="m/s")  "Third wind velocity component" annotation(Placement(transformation(origin={100,-70},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,-70},extent={{-10,-10},{10,10}})));
 protected
   ScenarioLibrary.Profiles.PiecewiseLinear x(n=n,times=times,values=values[:,1]);
   ScenarioLibrary.Profiles.PiecewiseLinear y(n=n,times=times,values=values[:,2]);
@@ -23,5 +23,5 @@ equation
         Text(extent={{-66,78},{67,58}}, textString="vx, vy, vz", textColor={0,0,127}, fontSize=0),
         Text(extent={{-150,155},{150,125}}, textString="%name", textColor={0,0,255}, fontSize=0)
       }),
-    Documentation(info="<html><p><b>Purpose</b> Three planned wind velocity profiles.</p><p><b>Interfaces</b> Modelica.Blocks.Interfaces.RealOutput vx(unit=\"m/s\"); Modelica.Blocks.Interfaces.RealOutput vy(unit=\"m/s\"); Modelica.Blocks.Interfaces.RealOutput vz(unit=\"m/s\")</p><p><b>Parameters</b> parameter Integer n(min=1)=2; parameter Modelica.Units.SI.Time times[n]=linspace(0,1,n); parameter Modelica.Units.SI.Velocity values[n,3]=fill(0,n,3)</p><p><b>Behavior</b> Three planned wind velocity profiles</p><p><b>Initialization</b> Evaluated from the current inputs and parameter bindings.</p><p><b>Activation and recovery</b> Not applicable.</p><p><b>Limitations</b> Outputs retain the units declared at the interface. Numerical values depend on the supplied input and parameter range.</p><p><b>Observables</b> vx, vy, vz</p><p><b>Example</b> <a href=\"modelica://ScenarioLibrary.Examples.EnvironmentalConditions\">ScenarioLibrary.Examples.EnvironmentalConditions</a></p></html>"));
+    Documentation(info="<html><p>Interpolate the three columns of <code>values</code> at the common scheduled times to obtain <code>vx</code>, <code>vy</code> and <code>vz</code>. The table holds each endpoint outside its time range.</p><p>Use strictly increasing times and define all three velocity components in the receiving model's coordinate frame. The block does not rotate the vector or calculate an aerodynamic load.</p></html>"));
 end Wind;

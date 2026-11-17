@@ -1,20 +1,20 @@
 within ScenarioLibrary.Profiles;
-block PeriodicProfile "Finite repetition of a linear planned profile"
-parameter Boolean useEnableInput=false "Use each enable edge as a local time origin";
-  parameter Real baseline=0;
-  parameter Integer n(min=1)=2;
-  parameter Modelica.Units.SI.Time times[n]=linspace(0,1,n);
-  parameter Real values[n]=linspace(0,1,n);
-  parameter Modelica.Units.SI.Time startTime=0;
-  parameter Modelica.Units.SI.Time period(min=Modelica.Constants.small)=2;
-  parameter Integer nCycles(min=1)=2;
-  parameter Real endValue=0;
-  Modelica.Blocks.Interfaces.BooleanInput enable if useEnableInput annotation(Placement(transformation(origin={0,100},extent={{-10,-10},{10,10}}),iconTransformation(origin={0,100},extent={{-10,-10},{10,10}})));
-  Modelica.Blocks.Interfaces.RealOutput y annotation(Placement(transformation(origin={100,0},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,0},extent={{-10,-10},{10,10}})));
+block PeriodicProfile "Finite repetition of a linearly interpolated profile"
+parameter Boolean useEnableInput=false "Expose enable and restart local time on each rising edge";
+  parameter Real baseline=0 "Output before the sequence or while disabled";
+  parameter Integer n(min=1)=2 "Number of table nodes";
+  parameter Modelica.Units.SI.Time times[n]=linspace(0,1,n) "Strictly increasing local table times within one period";
+  parameter Real values[n]=linspace(0,1,n) "Values at the table nodes";
+  parameter Modelica.Units.SI.Time startTime=0 "Start time on the selected time base";
+  parameter Modelica.Units.SI.Time period(min=Modelica.Constants.small)=2 "Positive repetition period";
+  parameter Integer nCycles(min=1)=2 "Number of scheduled periods";
+  parameter Real endValue=0 "Held output after the final period";
+  Modelica.Blocks.Interfaces.BooleanInput enable if useEnableInput  "Enable the profile and restart its local clock on a rising edge" annotation(Placement(transformation(origin={0,100},extent={{-10,-10},{10,10}}),iconTransformation(origin={0,100},extent={{-10,-10},{10,10}})));
+  Modelica.Blocks.Interfaces.RealOutput y  "Prescribed output signal" annotation(Placement(transformation(origin={100,0},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,0},extent={{-10,-10},{10,10}})));
 protected
-  Modelica.Blocks.Interfaces.BooleanInput enabled annotation(Placement(transformation(origin={-100,0},extent={{-10,-10},{10,10}}),iconTransformation(origin={-100,0},extent={{-10,-10},{10,10}})));
-  discrete Modelica.Units.SI.Time origin(start=0,fixed=true);
-  Modelica.Units.SI.Time tLocal;
+  Modelica.Blocks.Interfaces.BooleanInput enabled  "Internal profile-enable signal" annotation(Placement(transformation(origin={-100,0},extent={{-10,-10},{10,10}}),iconTransformation(origin={-100,0},extent={{-10,-10},{10,10}})));
+  discrete Modelica.Units.SI.Time origin(start=0,fixed=true) "Time of the most recent enable edge or initialisation";
+  Modelica.Units.SI.Time tLocal "Time on the selected absolute or local time base";
 initial equation
   assert(n>=1,"Empty time table.");
   for i in 2:n loop assert(times[i]>times[i-1],"Times must be strictly increasing."); end for;
@@ -33,5 +33,5 @@ equation
         Line(points={{-52,58},{48,58}}, color={128,128,128}, thickness=0.7, pattern=LinePattern.Solid, arrow={Arrow.None,Arrow.Filled}),
         Text(extent={{-150,155},{150,125}}, textString="%name", textColor={0,0,255}, fontSize=0)
       }),
-    Documentation(info="<html><p><b>Purpose</b> Finite repetition of a linear planned profile.</p><p><b>Interfaces</b> Modelica.Blocks.Interfaces.BooleanInput enable if useEnableInput; Modelica.Blocks.Interfaces.RealOutput y</p><p><b>Parameters</b> parameter Boolean useEnableInput=false \"Use each enable edge as a local time origin\"; parameter Real baseline=0; parameter Integer n(min=1)=2; parameter Modelica.Units.SI.Time times[n]=linspace(0,1,n); parameter Real values[n]=linspace(0,1,n); parameter Modelica.Units.SI.Time startTime=0; parameter Modelica.Units.SI.Time period(min=Modelica.Constants.small)=2; parameter Integer nCycles(min=1)=2; parameter Real endValue=0</p><p><b>Behavior</b> Finite repetition of a linear planned profile</p><p><b>Initialization</b> With external enable the first true value sets local time to zero.</p><p><b>Activation and recovery</b> Disable yields baseline and a later rising edge starts a new profile.</p><p><b>Limitations</b> Outputs retain the units declared at the interface. Numerical values depend on the supplied input and parameter range.</p><p><b>Observables</b> y</p><p><b>Example</b> <a href=\"modelica://ScenarioLibrary.Examples.MultiphaseMission\">ScenarioLibrary.Examples.MultiphaseMission</a></p></html>"));
+    Documentation(info="<html><p>Repeat the local table for <code>nCycles</code> periods from <code>startTime</code>. Table times must increase strictly and lie within <code>[0,period]</code>; interpolation holds endpoint values in any unused part of the period. Use <code>baseline</code> before the sequence and <code>endValue</code> at and after its final end while enabled.</p><p>With <code>useEnableInput=false</code>, the time base is absolute simulation time. Otherwise, each rising <code>enable</code> edge sets a new local origin; disabling returns <code>baseline</code> immediately. Re-enabling restarts the profile.</p></html>"));
 end PeriodicProfile;

@@ -1,16 +1,16 @@
 within ScenarioLibrary.Operating;
-block MultiModeSchedule "由阶段统一选择工况枚举和外生负载比例"
-  parameter Integer n(min=1) = 4 "工况段数";
-  parameter Modelica.Units.SI.Time startTime = 0 "首段起点，s";
-  parameter Modelica.Units.SI.Time durations[n](each min=Modelica.Constants.small) = fill(2,n) "各段时长，s";
-  parameter ScenarioLibrary.Utilities.Types.OperatingMode modes[n] = {ScenarioLibrary.Utilities.Types.OperatingMode.Startup,ScenarioLibrary.Utilities.Types.OperatingMode.Rated,ScenarioLibrary.Utilities.Types.OperatingMode.PartLoad,ScenarioLibrary.Utilities.Types.OperatingMode.Shutdown} "各阶段模式";
-  parameter Real loadFraction[n](each min=0,each max=1) = {0.3,1,0.6,0} "各阶段命令比例";
-  Modelica.Blocks.Interfaces.IntegerOutput phase "当前任务阶段索引" annotation(Placement(transformation(extent={{94,42},{106,54}}), iconTransformation(extent={{94,42},{106,54}})));
-  Modelica.Blocks.Interfaces.RealOutput demand "当前任务比例" annotation(Placement(transformation(extent={{94,-6},{106,6}}), iconTransformation(extent={{94,-6},{106,6}})));
-  Modelica.Blocks.Interfaces.BooleanOutput completed "时间表已完成" annotation(Placement(transformation(extent={{94,-54},{106,-42}}), iconTransformation(extent={{94,-54},{106,-42}})));
-  output ScenarioLibrary.Utilities.Types.OperatingMode mode "当前场景工况";
+block MultiModeSchedule "Duration-based mode and load-fraction schedule"
+  parameter Integer n(min=1) = 4 "Number of operating phases";
+  parameter Modelica.Units.SI.Time startTime = 0 "Absolute start of the first phase";
+  parameter Modelica.Units.SI.Time durations[n](each min=Modelica.Constants.small) = fill(2,n) "Positive durations of the consecutive phases";
+  parameter ScenarioLibrary.Utilities.Types.OperatingMode modes[n] = {ScenarioLibrary.Utilities.Types.OperatingMode.Startup,ScenarioLibrary.Utilities.Types.OperatingMode.Rated,ScenarioLibrary.Utilities.Types.OperatingMode.PartLoad,ScenarioLibrary.Utilities.Types.OperatingMode.Shutdown} "Operating mode selected in each phase";
+  parameter Real loadFraction[n](each min=0,each max=1) = {0.3,1,0.6,0} "Planned demand fraction in each phase";
+  Modelica.Blocks.Interfaces.IntegerOutput phase "One-based active phase index, or zero outside the schedule" annotation(Placement(transformation(extent={{94,42},{106,54}}), iconTransformation(extent={{94,42},{106,54}})));
+  Modelica.Blocks.Interfaces.RealOutput demand "Load fraction in the active phase, or zero outside it" annotation(Placement(transformation(extent={{94,-6},{106,6}}), iconTransformation(extent={{94,-6},{106,6}})));
+  Modelica.Blocks.Interfaces.BooleanOutput completed "The last scheduled phase has ended" annotation(Placement(transformation(extent={{94,-54},{106,-42}}), iconTransformation(extent={{94,-54},{106,-42}})));
+  output ScenarioLibrary.Utilities.Types.OperatingMode mode "Operating mode for the current phase or schedule state";
 protected
-  ScenarioLibrary.Timing.PhaseScheduler scheduler(n=n,startTime=startTime,durations=durations);
+  ScenarioLibrary.Timing.PhaseScheduler scheduler(n=n,startTime=startTime,durations=durations) "Duration-based phase scheduler";
 initial equation
   assert(min(loadFraction) >= 0 and max(loadFraction) <= 1, "Mode fractions must be in [0,1].");
 equation
@@ -33,26 +33,5 @@ equation
         Text(extent={{-150,155},{150,125}}, textString="%name", textColor={0,0,255}, fontSize=0)
       }),
     Diagram(coordinateSystem(extent={{-100,-100},{100,100}}, preserveAspectRatio=true), graphics={Text(extent={{-96,99},{96,88}}, textColor={30,104,76}, textString="MultiModeSchedule")}),
-    Documentation(info="<html><p><b>Purpose</b> 由阶段统一选择工况枚举和外生负载比例</p><p><b>Interfaces</b> Modelica.Blocks.Interfaces.IntegerOutput phase \"当前任务阶段索引\"; Modelica.Blocks.Interfaces.RealOutput demand \"当前任务比例\"; Modelica.Blocks.Interfaces.BooleanOutput completed \"时间表已完成\"; output ScenarioLibrary.Utilities.Types.OperatingMode mode \"当前场景工况\"</p><p><b>Parameters</b> parameter Integer n(min=1) = 4 \"工况段数\"; parameter Modelica.Units.SI.Time startTime = 0 \"首段起点，s\"; parameter Modelica.Units.SI.Time durations[n](each min=Modelica.Constants.small) = fill(2,n) \"各段时长，s\"; parameter ScenarioLibrary.Utilities.Types.OperatingMode modes[n] = {ScenarioLibrary.Utilities.Types.OperatingMode.Startup,ScenarioLibrary.Utilities.Types.OperatingMode.Rated,ScenarioLibrary.Utilities.Types.OperatingMode.PartLoad,ScenarioLibrary.Utilities.Types.OperatingMode.Shutdown} \"各阶段模式\"; parameter Real loadFraction[n](each min=0,each max=1) = {0.3,1,0.6,0} \"各阶段命令比例\"</p><p><b>Behavior</b> 由阶段统一选择工况枚举和外生负载比例</p><p><b>Initialization</b> Use the declared initial values and host state modifiers.</p><p><b>Activation and recovery</b> Not applicable.</p><p><b>Limitations</b> Use the declared parameter range. The catalog identifies simulation coverage.</p><p><b>Observables</b> Inspect the declared output variables.</p><p><b>Example</b> <a href=\"modelica://ScenarioLibrary.Examples.LoadAndCommandSchedules\">ScenarioLibrary.Examples.LoadAndCommandSchedules</a></p>
-<p>由阶段统一选择工况枚举和外生负载比例</p>
-<p>专业分类为 OperatingConditions.Mode。</p>
-<p>接口与方向</p>
-<ul>
-<li><code>Modelica.Blocks.Interfaces.IntegerOutput phase \"当前任务阶段索引\"</code></li>
-<li><code>Modelica.Blocks.Interfaces.RealOutput demand \"当前任务比例\"</code></li>
-<li><code>Modelica.Blocks.Interfaces.BooleanOutput completed \"时间表已完成\"</code></li>
-<li><code>output ScenarioLibrary.Utilities.Types.OperatingMode mode \"当前场景工况\"</code></li>
-</ul>
-<p>参数、类型、默认值及约束</p>
-<ul>
-<li><code>Integer n(min=1) = 4 \"工况段数\"</code></li>
-<li><code>Modelica.Units.SI.Time startTime = 0 \"首段起点，s\"</code></li>
-<li><code>Modelica.Units.SI.Time durations[n](each min=Modelica.Constants.small) = fill(2,n) \"各段时长，s\"</code></li>
-<li><code>ScenarioLibrary.Utilities.Types.OperatingMode modes[n] = {ScenarioLibrary.Utilities.Types.OperatingMode.Startup,ScenarioLibrary.Utilities.Types.OperatingMode.Rated,ScenarioLibrary.Utilities.Types.OperatingMode.PartLoad,ScenarioLibrary.Utilities.Types.OperatingMode.Shutdown} \"各阶段模式\"</code></li>
-<li><code>Real loadFraction[n](each min=0,each max=1) = {0.3,1,0.6,0} \"各阶段命令比例\"</code></li>
-</ul>
-<p><b>时序与基准行为</b> 阶段边界同时切换模式和负载比例。起点前待机，最后阶段后 Off。</p>
-<p><b>最小用法</b> 在共用任务时间表中同步驱动多个外部需求。模式数组和比例数组须与 n 匹配。 <a href=\"modelica://ScenarioLibrary.Examples.MultiphaseMission\">MultiPhaseSystemScenario</a> 展示同域接线。</p>
-<p><b>适用边界</b> 指令是计划值，段间可跳变，宿主应按自身动力学跟踪。</p>
-</html>"));
+    Documentation(info="<html><p>Use positive <code>durations</code> to form consecutive half-open phases from <code>startTime</code>. During phase <code>i</code>, output <code>modes[i]</code> and <code>loadFraction[i]</code>, with the one-based index on <code>phase</code>.</p><p>Before the schedule, the mode is Standby; after completion it is Off. Outside the active phases, <code>phase</code> and <code>demand</code> are zero. Each load fraction must lie in [0,1].</p></html>"));
 end MultiModeSchedule;

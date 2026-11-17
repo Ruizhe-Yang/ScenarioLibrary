@@ -1,12 +1,12 @@
 within ScenarioLibrary.Environment;
-block FluidBoundary "Planned pressure, temperature and composition signals"
-parameter Modelica.Units.SI.AbsolutePressure pressure(min=0)=101325;
-  parameter Modelica.Units.SI.Temperature temperature(min=0)=293.15;
-  parameter Integer nX(min=1)=1;
-  parameter Real fractions[nX]=fill(1.0/nX,nX);
-    Modelica.Blocks.Interfaces.RealOutput p(unit="Pa") annotation(Placement(transformation(origin={100,70},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,70},extent={{-10,-10},{10,10}})));
-  Modelica.Blocks.Interfaces.RealOutput T(unit="K") annotation(Placement(transformation(origin={100,0},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,0},extent={{-10,-10},{10,10}})));
-  Modelica.Blocks.Interfaces.RealOutput X[nX] annotation(Placement(transformation(origin={100,-70},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,-70},extent={{-10,-10},{10,10}})));
+block FluidBoundary "Constant pressure, temperature and composition signals"
+parameter Modelica.Units.SI.AbsolutePressure pressure(min=0)=101325 "Prescribed positive absolute pressure";
+  parameter Modelica.Units.SI.Temperature temperature(min=0)=293.15 "Prescribed positive absolute temperature";
+  parameter Integer nX(min=1)=1 "Number of composition fractions";
+  parameter Real fractions[nX]=fill(1.0/nX,nX) "Nonnegative fractions with unit sum";
+    Modelica.Blocks.Interfaces.RealOutput p(unit="Pa")  "Absolute-pressure signal" annotation(Placement(transformation(origin={100,70},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,70},extent={{-10,-10},{10,10}})));
+  Modelica.Blocks.Interfaces.RealOutput T(unit="K")  "Absolute-temperature signal" annotation(Placement(transformation(origin={100,0},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,0},extent={{-10,-10},{10,10}})));
+  Modelica.Blocks.Interfaces.RealOutput X[nX]  "Composition-fraction signals" annotation(Placement(transformation(origin={100,-70},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,-70},extent={{-10,-10},{10,10}})));
 initial equation
   assert(pressure>0 and temperature>0 and min(fractions)>=0 and abs(sum(fractions)-1)<1e-8,"Invalid boundary state.");
 equation
@@ -26,5 +26,5 @@ equation
         Text(extent={{28,-11},{49,-35}}, textString="X", textColor={0,0,127}, fontSize=0),
         Text(extent={{-150,155},{150,125}}, textString="%name", textColor={0,0,255}, fontSize=0)
       }),
-    Documentation(info="<html><p><b>Purpose</b> Planned pressure, temperature and composition signals.</p><p><b>Interfaces</b> Modelica.Blocks.Interfaces.RealOutput p(unit=\"Pa\"); Modelica.Blocks.Interfaces.RealOutput T(unit=\"K\"); Modelica.Blocks.Interfaces.RealOutput X[nX]</p><p><b>Parameters</b> parameter Modelica.Units.SI.AbsolutePressure pressure(min=0)=101325; parameter Modelica.Units.SI.Temperature temperature(min=0)=293.15; parameter Integer nX(min=1)=1; parameter Real fractions[nX]=fill(1.0/nX,nX)</p><p><b>Behavior</b> Planned pressure, temperature and composition signals</p><p><b>Initialization</b> The declared start values and initialization equations apply.</p><p><b>Activation and recovery</b> Not applicable.</p><p><b>Limitations</b> Composition size and medium selection must match the receiving boundary.</p><p><b>Observables</b> p, T, X</p><p><b>Example</b> <a href=\"modelica://ScenarioLibrary.Examples.EnvironmentalConditions\">ScenarioLibrary.Examples.EnvironmentalConditions</a></p></html>"));
+    Documentation(info="<html><p>Expose the prescribed absolute pressure, temperature and composition as <code>p</code>, <code>T</code> and <code>X</code> signal outputs. Pressure and temperature must be positive. Fractions must be nonnegative and sum to one within the declared tolerance.</p><p>This block supplies signals rather than a fluid port. Match <code>nX</code>, composition order and units to the receiving medium or boundary model.</p></html>"));
 end FluidBoundary;

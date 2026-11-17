@@ -1,16 +1,16 @@
 within ScenarioLibrary.Profiles;
-block PeriodicLoadCycle "有限次数重复播放一个完整负载周期"
-  parameter Integer n(min=2) = 3 "周期剖面节点数";
-  parameter Integer cycles(min=1) = 3 "执行周期数";
-  parameter Modelica.Units.SI.Time startTime = 0 "循环起点，s";
-  parameter Modelica.Units.SI.Time period(min=Modelica.Constants.small) = 2 "重复周期，s";
-  parameter Real points[n,2] = [0,0;period/2,1;period,0] "局部时刻与命令";
-  parameter Real standby = 0 "循环以外的指令";
-  Modelica.Blocks.Interfaces.RealOutput y "任务负载曲线" annotation(Placement(transformation(extent={{94,18},{106,30}}), iconTransformation(extent={{94,18},{106,30}})));
-  Modelica.Blocks.Interfaces.IntegerOutput cycle "活动周期序号从 1 起，循环外为 0" annotation(Placement(transformation(extent={{94,-30},{106,-18}}), iconTransformation(extent={{94,-30},{106,-18}})));
+block PeriodicLoadCycle "Finite repetition of a complete load table"
+  parameter Integer n(min=2) = 3 "Number of nodes in one load period";
+  parameter Integer cycles(min=1) = 3 "Number of scheduled periods";
+  parameter Modelica.Units.SI.Time startTime = 0 "Absolute start of the first load cycle";
+  parameter Modelica.Units.SI.Time period(min=Modelica.Constants.small) = 2 "Positive repetition period";
+  parameter Real points[n,2] = [0,0;period/2,1;period,0] "Local time and command pairs spanning exactly one period";
+  parameter Real standby = 0 "Output outside the finite sequence";
+  Modelica.Blocks.Interfaces.RealOutput y "Interpolated load command" annotation(Placement(transformation(extent={{94,18},{106,30}}), iconTransformation(extent={{94,18},{106,30}})));
+  Modelica.Blocks.Interfaces.IntegerOutput cycle "One-based active cycle index, or zero outside the sequence" annotation(Placement(transformation(extent={{94,-30},{106,-18}}), iconTransformation(extent={{94,-30},{106,-18}})));
 protected
-  Boolean active;
-  Modelica.Blocks.Tables.CombiTable1Ds table(table=points,columns={2},smoothness=Modelica.Blocks.Types.Smoothness.LinearSegments,extrapolation=Modelica.Blocks.Types.Extrapolation.HoldLastPoint);
+  Boolean active "The finite profile sequence is active";
+  Modelica.Blocks.Tables.CombiTable1Ds table(table=points,columns={2},smoothness=Modelica.Blocks.Types.Smoothness.LinearSegments,extrapolation=Modelica.Blocks.Types.Extrapolation.HoldLastPoint) "Linear interpolation of the local profile table";
 initial equation
   assert(n >= 2 and cycles >= 1 and period > 0, "Invalid number or period of load cycles.");
   assert(abs(points[1,1]) <= 1e-12*period and abs(points[n,1]-period) <= 1e-12*period and
@@ -30,25 +30,5 @@ equation
         Text(extent={{-150,155},{150,125}}, textString="%name", textColor={0,0,255}, fontSize=0)
       }),
     Diagram(coordinateSystem(extent={{-100,-100},{100,100}}, preserveAspectRatio=true), graphics={Text(extent={{-96,99},{96,88}}, textColor={30,104,76}, textString="PeriodicLoadCycle")}),
-    Documentation(info="<html><p><b>Purpose</b> 有限次数重复播放一个完整负载周期</p><p><b>Interfaces</b> Modelica.Blocks.Interfaces.RealOutput y \"任务负载曲线\"; Modelica.Blocks.Interfaces.IntegerOutput cycle \"活动周期序号从 1 起，循环外为 0\"</p><p><b>Parameters</b> parameter Integer n(min=2) = 3 \"周期剖面节点数\"; parameter Integer cycles(min=1) = 3 \"执行周期数\"; parameter Modelica.Units.SI.Time startTime = 0 \"循环起点，s\"; parameter Modelica.Units.SI.Time period(min=Modelica.Constants.small) = 2 \"重复周期，s\"; parameter Real points[n,2] = [0,0;period/2,1;period,0] \"局部时刻与命令\"; parameter Real standby = 0 \"循环以外的指令\"</p><p><b>Behavior</b> 有限次数重复播放一个完整负载周期</p><p><b>Initialization</b> Use the declared initial values and host state modifiers.</p><p><b>Activation and recovery</b> Not applicable.</p><p><b>Limitations</b> Use the declared parameter range. The catalog identifies simulation coverage.</p><p><b>Observables</b> Inspect the declared output variables.</p><p><b>Example</b> <a href=\"modelica://ScenarioLibrary.Examples.MultiphaseMission\">ScenarioLibrary.Examples.MultiphaseMission</a></p>
-<p>有限次数重复播放一个完整负载周期</p>
-<p>专业分类为 MissionProfiles.Cyclic。</p>
-<p>接口与方向</p>
-<ul>
-<li><code>Modelica.Blocks.Interfaces.RealOutput y \"任务负载曲线\"</code></li>
-<li><code>Modelica.Blocks.Interfaces.IntegerOutput cycle \"活动周期序号从 1 起，循环外为 0\"</code></li>
-</ul>
-<p>参数、类型、默认值及约束</p>
-<ul>
-<li><code>Integer n(min=2) = 3 \"周期剖面节点数\"</code></li>
-<li><code>Integer cycles(min=1) = 3 \"执行周期数\"</code></li>
-<li><code>Modelica.Units.SI.Time startTime = 0 \"循环起点，s\"</code></li>
-<li><code>Modelica.Units.SI.Time period(min=Modelica.Constants.small) = 2 \"重复周期，s\"</code></li>
-<li><code>Real points[n,2] = [0,0;period/2,1;period,0] \"局部时刻与命令\"</code></li>
-<li><code>Real standby = 0 \"循环以外的指令\"</code></li>
-</ul>
-<p><b>时序与基准行为</b> 每周期在左端从头播放。终点后保持 standby。若首尾值不同，则重复接缝发生跃变。</p>
-<p><b>最小用法</b> 接任务功率比例或负载轨迹，可观测 cycle 作为阶段标记。 <a href=\"modelica://ScenarioLibrary.Examples.MultiphaseMission\">ElectricalLoadScenario</a> 展示同域接线。</p>
-<p><b>适用边界</b> period 及两端节点时刻须一致，建议与 standby 对齐以平滑启停。</p>
-</html>"));
+    Documentation(info="<html><p>Play a linearly interpolated table during <code>[startTime,startTime+cycles*period)</code>. The first table time must be zero, the last must equal <code>period</code>, and intermediate times must increase strictly. All timing uses absolute simulation time.</p><p>The modulus resets the table input at every period boundary. <code>cycle</code> is one-based while active and zero outside the sequence; <code>y</code> is <code>standby</code> outside it.</p></html>"));
 end PeriodicLoadCycle;

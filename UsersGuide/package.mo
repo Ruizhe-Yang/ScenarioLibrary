@@ -1,5 +1,5 @@
 within ScenarioLibrary;
-package UsersGuide "UsersGuide"
+package UsersGuide "User's guide"
   extends Modelica.Icons.Package;
   annotation(Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
       graphics={
@@ -10,4 +10,5 @@ package UsersGuide "UsersGuide"
         Line(points={{-46.92,3.68},{-18.4,-2.76}}, color={128,128,128}, thickness=0.8, pattern=LinePattern.Solid),
         Line(points={{6.44,-2.76},{38.64,3.68}}, color={128,128,128}, thickness=0.8, pattern=LinePattern.Solid)
       }));
+  annotation(Documentation(info="<html><p>Read GettingStarted for the first simulation, Conventions for interface and timing rules, and Limitations for initialisation and boundary assumptions.</p></html>"));
 end UsersGuide;

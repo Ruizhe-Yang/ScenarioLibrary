@@ -1,10 +1,10 @@
 within ScenarioLibrary.Timing;
-block TaskStatus "Declared task transitions with abort priority"
-Modelica.Blocks.Interfaces.BooleanInput start annotation(Placement(transformation(origin={-100,70},extent={{-10,-10},{10,10}}),iconTransformation(origin={-100,70},extent={{-10,-10},{10,10}})));
-  Modelica.Blocks.Interfaces.BooleanInput complete annotation(Placement(transformation(origin={-100,0},extent={{-10,-10},{10,10}}),iconTransformation(origin={-100,0},extent={{-10,-10},{10,10}})));
-  Modelica.Blocks.Interfaces.BooleanInput abort annotation(Placement(transformation(origin={-100,-70},extent={{-10,-10},{10,10}}),iconTransformation(origin={-100,-70},extent={{-10,-10},{10,10}})));
-  Modelica.Blocks.Interfaces.BooleanOutput running annotation(Placement(transformation(origin={100,0},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,0},extent={{-10,-10},{10,10}})));
-  output ScenarioLibrary.Utilities.Types.TaskState status(start=ScenarioLibrary.Utilities.Types.TaskState.Idle,fixed=true);
+block TaskStatus "Declared task state with abort and completion priority"
+Modelica.Blocks.Interfaces.BooleanInput start  "Task start request" annotation(Placement(transformation(origin={-100,70},extent={{-10,-10},{10,10}}),iconTransformation(origin={-100,70},extent={{-10,-10},{10,10}})));
+  Modelica.Blocks.Interfaces.BooleanInput complete  "External task completion request" annotation(Placement(transformation(origin={-100,0},extent={{-10,-10},{10,10}}),iconTransformation(origin={-100,0},extent={{-10,-10},{10,10}})));
+  Modelica.Blocks.Interfaces.BooleanInput abort  "Task abort request with highest priority" annotation(Placement(transformation(origin={-100,-70},extent={{-10,-10},{10,10}}),iconTransformation(origin={-100,-70},extent={{-10,-10},{10,10}})));
+  Modelica.Blocks.Interfaces.BooleanOutput running  "True only when status is Running" annotation(Placement(transformation(origin={100,0},extent={{-10,-10},{10,10}}),iconTransformation(origin={100,0},extent={{-10,-10},{10,10}})));
+  output ScenarioLibrary.Utilities.Types.TaskState status(start=ScenarioLibrary.Utilities.Types.TaskState.Idle,fixed=true) "Declared task state";
 algorithm
   when {initial(),start,complete,abort} then
     if abort then status:=ScenarioLibrary.Utilities.Types.TaskState.Aborted;
@@ -29,5 +29,5 @@ equation
         Line(points={{-8,-25},{8,-47}}, color={191,0,0}, thickness=1, pattern=LinePattern.Solid),
         Text(extent={{-150,155},{150,125}}, textString="%name", textColor={0,0,255}, fontSize=0)
       }),
-    Documentation(info="<html><p><b>Purpose</b> Declared task transitions with abort priority.</p><p><b>Interfaces</b> Modelica.Blocks.Interfaces.BooleanInput start; Modelica.Blocks.Interfaces.BooleanInput complete; Modelica.Blocks.Interfaces.BooleanInput abort; Modelica.Blocks.Interfaces.BooleanOutput running; output ScenarioLibrary.Utilities.Types.TaskState status(start=ScenarioLibrary.Utilities.Types.TaskState.Idle,fixed=true)</p><p><b>Parameters</b> No tuning parameters; use the declared input contract.</p><p><b>Behavior</b> Abort takes precedence over completion and start. Completion takes precedence over a simultaneous start.</p><p><b>Initialization</b> The declared start values and initialization equations apply.</p><p><b>Activation and recovery</b> Not applicable.</p><p><b>Limitations</b> Outputs retain the units declared at the interface. Numerical values depend on the supplied input and parameter range.</p><p><b>Observables</b> running</p><p><b>Example</b> <a href=\"modelica://ScenarioLibrary.Examples.PhaseQualifiedWindows\">ScenarioLibrary.Examples.PhaseQualifiedWindows</a></p></html>"));
+    Documentation(info="<html><p>Update <code>status</code> at initialisation and at rising events on <code>start</code>, <code>complete</code> or <code>abort</code>. At each such event, the current abort level has priority. Completion is accepted when complete is true and either start is true or the previous status was Running; otherwise a true start selects Running.</p><p>Unaccepted events retain the previous status. Simultaneous start and completion select Completed unless abort is true. <code>running</code> is true only for the Running state. These are externally declared task transitions.</p></html>"));
 end TaskStatus;

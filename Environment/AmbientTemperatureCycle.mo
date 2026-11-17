@@ -1,10 +1,10 @@
 within ScenarioLibrary.Environment;
-block AmbientTemperatureCycle "以给定峰时描述可重复的环境温度循环"
-  parameter Modelica.Units.SI.Temperature minimumTemperature(min=0) = 288.15 "谷值，K";
-  parameter Modelica.Units.SI.Temperature maximumTemperature(min=0) = 303.15 "峰值，K";
-  parameter Modelica.Units.SI.Time period(min=Modelica.Constants.small) = 86400 "周期，s";
-  parameter Modelica.Units.SI.Time peakTime = 50400 "任一峰值时刻，s";
-  Modelica.Blocks.Interfaces.RealOutput temperature(unit="K") "环境温度" annotation(Placement(transformation(extent={{94,-6},{106,6}}), iconTransformation(extent={{94,-6},{106,6}})));
+block AmbientTemperatureCycle "Periodic ambient temperature with a prescribed peak time"
+  parameter Modelica.Units.SI.Temperature minimumTemperature(min=0) = 288.15 "Minimum absolute temperature in the cycle";
+  parameter Modelica.Units.SI.Temperature maximumTemperature(min=0) = 303.15 "Maximum absolute temperature in the cycle";
+  parameter Modelica.Units.SI.Time period(min=Modelica.Constants.small) = 86400 "Positive repetition period";
+  parameter Modelica.Units.SI.Time peakTime = 50400 "Time of any temperature maximum";
+  Modelica.Blocks.Interfaces.RealOutput temperature(unit="K") "Prescribed ambient absolute temperature" annotation(Placement(transformation(extent={{94,-6},{106,6}}), iconTransformation(extent={{94,-6},{106,6}})));
 initial equation
   assert(minimumTemperature > 0 and maximumTemperature >= minimumTemperature and period > 0, "Invalid ambient cycle.");
 equation
@@ -24,22 +24,5 @@ equation
         Text(extent={{-150,155},{150,125}}, textString="%name", textColor={0,0,255}, fontSize=0)
       }),
     Diagram(coordinateSystem(extent={{-100,-100},{100,100}}, preserveAspectRatio=true), graphics={Text(extent={{-96,99},{96,88}}, textColor={30,104,76}, textString="AmbientTemperatureCycle")}),
-    Documentation(info="<html><p><b>Purpose</b> 以给定峰时描述可重复的环境温度循环</p><p><b>Interfaces</b> Modelica.Blocks.Interfaces.RealOutput temperature(unit=\"K\") \"环境温度\"</p><p><b>Parameters</b> parameter Modelica.Units.SI.Temperature minimumTemperature(min=0) = 288.15 \"谷值，K\"; parameter Modelica.Units.SI.Temperature maximumTemperature(min=0) = 303.15 \"峰值，K\"; parameter Modelica.Units.SI.Time period(min=Modelica.Constants.small) = 86400 \"周期，s\"; parameter Modelica.Units.SI.Time peakTime = 50400 \"任一峰值时刻，s\"</p><p><b>Behavior</b> 以给定峰时描述可重复的环境温度循环</p><p><b>Initialization</b> Use the declared initial values and host state modifiers.</p><p><b>Activation and recovery</b> Not applicable.</p><p><b>Limitations</b> Use the declared parameter range. The catalog identifies simulation coverage.</p><p><b>Observables</b> Inspect the declared output variables.</p><p><b>Example</b> <a href=\"modelica://ScenarioLibrary.Examples.EnvironmentalConditions\">ScenarioLibrary.Examples.EnvironmentalConditions</a></p>
-<p>以给定峰时描述可重复的环境温度循环</p>
-<p>专业分类为 Environment.Thermal。</p>
-<p>接口与方向</p>
-<ul>
-<li><code>Modelica.Blocks.Interfaces.RealOutput temperature(unit=\"K\") \"环境温度\"</code></li>
-</ul>
-<p>参数、类型、默认值及约束</p>
-<ul>
-<li><code>Modelica.Units.SI.Temperature minimumTemperature(min=0) = 288.15 \"谷值，K\"</code></li>
-<li><code>Modelica.Units.SI.Temperature maximumTemperature(min=0) = 303.15 \"峰值，K\"</code></li>
-<li><code>Modelica.Units.SI.Time period(min=Modelica.Constants.small) = 86400 \"周期，s\"</code></li>
-<li><code>Modelica.Units.SI.Time peakTime = 50400 \"任一峰值时刻，s\"</code></li>
-</ul>
-<p><b>时序与基准行为</b> 仿真全程按周期定义，峰时等于最高温。恒温可令两极值相等。</p>
-<p><b>最小用法</b> 接 PrescribedTemperature.T 或流体边界温度端。 <a href=\"modelica://ScenarioLibrary.Examples.MultiphaseMission\">ThermalCycleScenario</a> 展示同域接线。</p>
-<p><b>适用边界</b> 周期模型忽略天气随机变化，气温需与实际环境数据核对。</p>
-</html>"));
+    Documentation(info="<html><p>Generate a cosine temperature cycle between <code>minimumTemperature</code> and <code>maximumTemperature</code>. A peak occurs at <code>peakTime</code> and repeats every <code>period</code>.</p><p>The cycle is defined over the whole simulation, including instants before peakTime. Set positive absolute temperatures, an ordered range and a positive period; the temperature output is in kelvin.</p></html>"));
 end AmbientTemperatureCycle;

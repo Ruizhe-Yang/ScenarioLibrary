@@ -1,11 +1,11 @@
 within ScenarioLibrary.Operating;
-block DutyCycle "重复给出正常运行与休息时段"
-  parameter Modelica.Units.SI.Time startTime = 0 "第一个周期起点，s";
-  parameter Modelica.Units.SI.Time period(min=Modelica.Constants.small) = 5 "重复周期，s";
-  parameter Real duty(min=0,max=1) = 0.5 "周期内运行比例";
-  parameter Integer cycles(min=1) = 3 "计划执行周期数";
-  Modelica.Blocks.Interfaces.BooleanOutput running "处于计划运行时段" annotation(Placement(transformation(extent={{94,18},{106,30}}), iconTransformation(extent={{94,18},{106,30}})));
-  Modelica.Blocks.Interfaces.BooleanOutput completed "计划周期全部结束" annotation(Placement(transformation(extent={{94,-30},{106,-18}}), iconTransformation(extent={{94,-30},{106,-18}})));
+block DutyCycle "Finite schedule of running and idle intervals"
+  parameter Modelica.Units.SI.Time startTime = 0 "Absolute start of the first duty period";
+  parameter Modelica.Units.SI.Time period(min=Modelica.Constants.small) = 5 "Positive repetition period";
+  parameter Real duty(min=0,max=1) = 0.5 "Fraction of each period assigned to running";
+  parameter Integer cycles(min=1) = 3 "Number of scheduled periods";
+  Modelica.Blocks.Interfaces.BooleanOutput running "The current instant belongs to a scheduled running interval" annotation(Placement(transformation(extent={{94,18},{106,30}}), iconTransformation(extent={{94,18},{106,30}})));
+  Modelica.Blocks.Interfaces.BooleanOutput completed "The final scheduled period has ended" annotation(Placement(transformation(extent={{94,-30},{106,-18}}), iconTransformation(extent={{94,-30},{106,-18}})));
 initial equation
   assert(period > 0 and duty >= 0 and duty <= 1 and cycles >= 1, "Invalid duty schedule.");
 equation
@@ -21,23 +21,5 @@ equation
         Text(extent={{-150,155},{150,125}}, textString="%name", textColor={0,0,255}, fontSize=0)
       }),
     Diagram(coordinateSystem(extent={{-100,-100},{100,100}}, preserveAspectRatio=true), graphics={Text(extent={{-96,99},{96,88}}, textColor={30,104,76}, textString="DutyCycle")}),
-    Documentation(info="<html><p><b>Purpose</b> 重复给出正常运行与休息时段</p><p><b>Interfaces</b> Modelica.Blocks.Interfaces.BooleanOutput running \"处于计划运行时段\"; Modelica.Blocks.Interfaces.BooleanOutput completed \"计划周期全部结束\"</p><p><b>Parameters</b> parameter Modelica.Units.SI.Time startTime = 0 \"第一个周期起点，s\"; parameter Modelica.Units.SI.Time period(min=Modelica.Constants.small) = 5 \"重复周期，s\"; parameter Real duty(min=0,max=1) = 0.5 \"周期内运行比例\"; parameter Integer cycles(min=1) = 3 \"计划执行周期数\"</p><p><b>Behavior</b> 重复给出正常运行与休息时段</p><p><b>Initialization</b> Use the declared initial values and host state modifiers.</p><p><b>Activation and recovery</b> Not applicable.</p><p><b>Limitations</b> Use the declared parameter range. The catalog identifies simulation coverage.</p><p><b>Observables</b> Inspect the declared output variables.</p><p><b>Example</b> <a href=\"modelica://ScenarioLibrary.Examples.LoadAndCommandSchedules\">ScenarioLibrary.Examples.LoadAndCommandSchedules</a></p>
-<p>重复给出正常运行与休息时段</p>
-<p>专业分类为 OperatingConditions.Duty。</p>
-<p>接口与方向</p>
-<ul>
-<li><code>Modelica.Blocks.Interfaces.BooleanOutput running \"处于计划运行时段\"</code></li>
-<li><code>Modelica.Blocks.Interfaces.BooleanOutput completed \"计划周期全部结束\"</code></li>
-</ul>
-<p>参数、类型、默认值及约束</p>
-<ul>
-<li><code>Modelica.Units.SI.Time startTime = 0 \"第一个周期起点，s\"</code></li>
-<li><code>Modelica.Units.SI.Time period(min=Modelica.Constants.small) = 5 \"重复周期，s\"</code></li>
-<li><code>Real duty(min=0,max=1) = 0.5 \"周期内运行比例\"</code></li>
-<li><code>Integer cycles(min=1) = 3 \"计划执行周期数\"</code></li>
-</ul>
-<p><b>时序与基准行为</b> 周期首段运行，其后休息。任务完毕后停止，duty 为 0 或 1 时分别全休或全运行。</p>
-<p><b>最小用法</b> 可用运行位驱动循环充能或待机任务命令。 <a href=\"modelica://ScenarioLibrary.Examples.MultiphaseMission\">ElectricalLoadScenario</a> 展示同域接线。</p>
-<p><b>适用边界</b> 短周期生成较多时间事件，调度不包含执行延迟。</p>
-</html>"));
+    Documentation(info="<html><p>Set <code>running</code> during the first <code>duty*period</code> seconds of each scheduled period. Periods begin at the absolute <code>startTime</code> and repeat <code>cycles</code> times using half-open intervals.</p><p><code>completed</code> becomes true at the end of the last period. A zero duty gives no running interval; unit duty keeps running true throughout the scheduled sequence.</p></html>"));
 end DutyCycle;
